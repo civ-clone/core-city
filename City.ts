@@ -58,13 +58,7 @@ export class City extends DataObject implements ICity {
 
     (this.#ruleRegistry as ICreatedRegistry).process(Created, this);
 
-    this.addKey(
-      'name',
-      // 'player',
-      'tile',
-      'tilesWorked',
-      'yields'
-    );
+    this.addKey('name', 'player', 'tile', 'tilesWorked', 'yields');
   }
 
   capture(player: Player): void {

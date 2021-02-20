@@ -42,9 +42,7 @@ class City extends DataObject_1.DataObject {
         __classPrivateFieldGet(this, _tilesWorked).push(tile);
         __classPrivateFieldSet(this, _ruleRegistry, ruleRegistry);
         __classPrivateFieldGet(this, _ruleRegistry).process(Created_1.Created, this);
-        this.addKey('name', 
-        // 'player',
-        'tile', 'tilesWorked', 'yields');
+        this.addKey('name', 'player', 'tile', 'tilesWorked', 'yields');
     }
     capture(player) {
         __classPrivateFieldSet(this, _player, player);
