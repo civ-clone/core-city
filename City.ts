@@ -27,6 +27,7 @@ export interface ICity extends IDataObject {
   originalPlayer(): Player;
   player(): Player;
   tile(): Tile;
+  tiles(): Tileset;
   tilesWorked(): Tileset;
   yields(yields: typeof Yield[], yieldRegistry: YieldRegistry): Yield[];
 }
@@ -52,13 +53,22 @@ export class City extends DataObject implements ICity {
     this.#originalPlayer = player;
     this.#player = player;
     this.#tile = tile;
+    // TODO: have this controlled via `Rule`s to match original (removing indices 0, 4, 20, 24)
     this.#tiles = this.#tile.getSurroundingArea();
     this.#tilesWorked.push(tile);
     this.#ruleRegistry = ruleRegistry;
 
     (this.#ruleRegistry as ICreatedRegistry).process(Created, this);
 
-    this.addKey('name', 'player', 'tile', 'tilesWorked', 'yields');
+    this.addKey(
+      'name',
+      'originalPlayer',
+      'player',
+      'tile',
+      'tiles',
+      'tilesWorked',
+      'yields'
+    );
   }
 
   capture(player: Player): void {
@@ -89,6 +99,10 @@ export class City extends DataObject implements ICity {
 
   tile(): Tile {
     return this.#tile;
+  }
+
+  tiles(): Tileset {
+    return this.#tiles;
   }
 
   tilesWorked(): Tileset {

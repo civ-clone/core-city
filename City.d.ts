@@ -15,6 +15,7 @@ export interface ICity extends IDataObject {
   originalPlayer(): Player;
   player(): Player;
   tile(): Tile;
+  tiles(): Tileset;
   tilesWorked(): Tileset;
   yields(yields: typeof Yield[], yieldRegistry: YieldRegistry): Yield[];
 }
@@ -33,6 +34,7 @@ export declare class City extends DataObject implements ICity {
   originalPlayer(): Player;
   player(): Player;
   tile(): Tile;
+  tiles(): Tileset;
   tilesWorked(): Tileset;
   yields(yields?: typeof Yield[], yieldRegistry?: YieldRegistry): Yield[];
 }

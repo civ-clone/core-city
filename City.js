@@ -38,11 +38,12 @@ class City extends DataObject_1.DataObject {
         __classPrivateFieldSet(this, _originalPlayer, player);
         __classPrivateFieldSet(this, _player, player);
         __classPrivateFieldSet(this, _tile, tile);
+        // TODO: have this controlled via `Rule`s to match original (removing indices 0, 4, 20, 24)
         __classPrivateFieldSet(this, _tiles, __classPrivateFieldGet(this, _tile).getSurroundingArea());
         __classPrivateFieldGet(this, _tilesWorked).push(tile);
         __classPrivateFieldSet(this, _ruleRegistry, ruleRegistry);
         __classPrivateFieldGet(this, _ruleRegistry).process(Created_1.Created, this);
-        this.addKey('name', 'player', 'tile', 'tilesWorked', 'yields');
+        this.addKey('name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
     }
     capture(player) {
         __classPrivateFieldSet(this, _player, player);
@@ -65,6 +66,9 @@ class City extends DataObject_1.DataObject {
     }
     tile() {
         return __classPrivateFieldGet(this, _tile);
+    }
+    tiles() {
+        return __classPrivateFieldGet(this, _tiles);
     }
     tilesWorked() {
         return __classPrivateFieldGet(this, _tilesWorked);
