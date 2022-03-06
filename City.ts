@@ -71,10 +71,18 @@ export class City extends DataObject implements ICity {
     );
   }
 
-  capture(player: Player): void {
-    this.#player = player;
+  capture(capturingPlayer: Player): void {
+    // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
+    const player = this.#player;
 
-    (this.#ruleRegistry as ICapturedRegistry).process(Captured, this, player);
+    this.#player = capturingPlayer;
+
+    (this.#ruleRegistry as ICapturedRegistry).process(
+      Captured,
+      this,
+      capturingPlayer,
+      player
+    );
   }
 
   destroy(player: Player | null = null): void {

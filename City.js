@@ -45,9 +45,11 @@ class City extends DataObject_1.DataObject {
         __classPrivateFieldGet(this, _ruleRegistry).process(Created_1.Created, this);
         this.addKey('name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
     }
-    capture(player) {
-        __classPrivateFieldSet(this, _player, player);
-        __classPrivateFieldGet(this, _ruleRegistry).process(Captured_1.Captured, this, player);
+    capture(capturingPlayer) {
+        // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
+        const player = __classPrivateFieldGet(this, _player);
+        __classPrivateFieldSet(this, _player, capturingPlayer);
+        __classPrivateFieldGet(this, _ruleRegistry).process(Captured_1.Captured, this, capturingPlayer, player);
     }
     destroy(player = null) {
         __classPrivateFieldGet(this, _ruleRegistry).process(Destroyed_1.Destroyed, this, player);

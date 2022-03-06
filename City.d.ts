@@ -27,7 +27,7 @@ export declare class City extends DataObject implements ICity {
     name: string,
     ruleRegistry?: RuleRegistry
   );
-  capture(player: Player): void;
+  capture(capturingPlayer: Player): void;
   destroy(player?: Player | null): void;
   name(): string;
   setName(name: string): void;
