@@ -40,12 +40,14 @@ export class City extends DataObject implements ICity {
   #tile: Tile;
   #tiles: Tileset;
   #tilesWorked: Tileset = new Tileset();
+  #yieldRegistry: YieldRegistry;
 
   constructor(
     player: Player,
     tile: Tile,
     name: string,
-    ruleRegistry: RuleRegistry = ruleRegistryInstance
+    ruleRegistry: RuleRegistry = ruleRegistryInstance,
+    yieldRegistry: YieldRegistry = yieldRegistryInstance
   ) {
     super();
 
@@ -57,6 +59,7 @@ export class City extends DataObject implements ICity {
     this.#tiles = this.#tile.getSurroundingArea();
     this.#tilesWorked.push(tile);
     this.#ruleRegistry = ruleRegistry;
+    this.#yieldRegistry = yieldRegistry;
 
     (this.#ruleRegistry as ICreatedRegistry).process(Created, this);
 
@@ -119,7 +122,7 @@ export class City extends DataObject implements ICity {
 
   yields(
     yields: typeof Yield[] = [],
-    yieldRegistry: YieldRegistry = yieldRegistryInstance
+    yieldRegistry: YieldRegistry = this.#yieldRegistry
   ): Yield[] {
     if (yields.length === 0) {
       yields = yieldRegistry.entries();

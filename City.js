@@ -12,7 +12,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     }
     return privateMap.get(receiver);
 };
-var _name, _originalPlayer, _player, _ruleRegistry, _tile, _tiles, _tilesWorked;
+var _name, _originalPlayer, _player, _ruleRegistry, _tile, _tiles, _tilesWorked, _yieldRegistry;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.City = void 0;
 const Captured_1 = require("./Rules/Captured");
@@ -25,7 +25,7 @@ const Yield_1 = require("./Rules/Yield");
 const YieldRegistry_1 = require("@civ-clone/core-yield/YieldRegistry");
 const Tileset_1 = require("@civ-clone/core-world/Tileset");
 class City extends DataObject_1.DataObject {
-    constructor(player, tile, name, ruleRegistry = RuleRegistry_1.instance) {
+    constructor(player, tile, name, ruleRegistry = RuleRegistry_1.instance, yieldRegistry = YieldRegistry_1.instance) {
         super();
         _name.set(this, void 0);
         _originalPlayer.set(this, void 0);
@@ -34,6 +34,7 @@ class City extends DataObject_1.DataObject {
         _tile.set(this, void 0);
         _tiles.set(this, void 0);
         _tilesWorked.set(this, new Tileset_1.default());
+        _yieldRegistry.set(this, void 0);
         __classPrivateFieldSet(this, _name, name);
         __classPrivateFieldSet(this, _originalPlayer, player);
         __classPrivateFieldSet(this, _player, player);
@@ -42,6 +43,7 @@ class City extends DataObject_1.DataObject {
         __classPrivateFieldSet(this, _tiles, __classPrivateFieldGet(this, _tile).getSurroundingArea());
         __classPrivateFieldGet(this, _tilesWorked).push(tile);
         __classPrivateFieldSet(this, _ruleRegistry, ruleRegistry);
+        __classPrivateFieldSet(this, _yieldRegistry, yieldRegistry);
         __classPrivateFieldGet(this, _ruleRegistry).process(Created_1.Created, this);
         this.addKey('name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
     }
@@ -75,7 +77,7 @@ class City extends DataObject_1.DataObject {
     tilesWorked() {
         return __classPrivateFieldGet(this, _tilesWorked);
     }
-    yields(yields = [], yieldRegistry = YieldRegistry_1.instance) {
+    yields(yields = [], yieldRegistry = __classPrivateFieldGet(this, _yieldRegistry)) {
         if (yields.length === 0) {
             yields = yieldRegistry.entries();
         }
@@ -89,6 +91,6 @@ class City extends DataObject_1.DataObject {
     }
 }
 exports.City = City;
-_name = new WeakMap(), _originalPlayer = new WeakMap(), _player = new WeakMap(), _ruleRegistry = new WeakMap(), _tile = new WeakMap(), _tiles = new WeakMap(), _tilesWorked = new WeakMap();
+_name = new WeakMap(), _originalPlayer = new WeakMap(), _player = new WeakMap(), _ruleRegistry = new WeakMap(), _tile = new WeakMap(), _tiles = new WeakMap(), _tilesWorked = new WeakMap(), _yieldRegistry = new WeakMap();
 exports.default = City;
 //# sourceMappingURL=City.js.map

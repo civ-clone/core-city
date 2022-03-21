@@ -25,7 +25,8 @@ export declare class City extends DataObject implements ICity {
     player: Player,
     tile: Tile,
     name: string,
-    ruleRegistry?: RuleRegistry
+    ruleRegistry?: RuleRegistry,
+    yieldRegistry?: YieldRegistry
   );
   capture(capturingPlayer: Player): void;
   destroy(player?: Player | null): void;
