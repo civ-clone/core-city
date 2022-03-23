@@ -13,10 +13,10 @@ const { expect, use } = chai;
 use(spies);
 
 describe('City', (): void => {
-  it('should process `Captured` `Rule`s on `capture`', (): void => {
+  it('should process `Captured` `Rule`s on `capture`', async (): Promise<void> => {
     const ruleRegistry = new RuleRegistry(),
       spy = chai.spy(),
-      city = setUpCity('', ruleRegistry),
+      city = await setUpCity('', ruleRegistry),
       originalPlayer = city.player(),
       player = new Player();
 
@@ -31,10 +31,10 @@ describe('City', (): void => {
     expect(city.originalPlayer()).to.equal(originalPlayer);
   });
 
-  it('should process `Destroyed` `Rule`s on `destroy`', (): void => {
+  it('should process `Destroyed` `Rule`s on `destroy`', async (): Promise<void> => {
     const ruleRegistry = new RuleRegistry(),
       spy = chai.spy(),
-      city = setUpCity('', ruleRegistry);
+      city = await setUpCity('', ruleRegistry);
 
     ruleRegistry.register(new Destroyed(new Effect(spy)));
 
@@ -43,8 +43,8 @@ describe('City', (): void => {
     expect(spy).to.called.once;
   });
 
-  it('should be possible to rename the city', (): void => {
-    const city = setUpCity('city #1');
+  it('should be possible to rename the city', async (): Promise<void> => {
+    const city = await setUpCity('city #1');
 
     expect(city.name()).to.equal('city #1');
 
@@ -53,8 +53,8 @@ describe('City', (): void => {
     expect(city.name()).to.equal('city #2');
   });
 
-  it('should be possible to get yields via `tilesWorked`', (): void => {
-    const city = setUpCity(),
+  it('should be possible to get yields via `tilesWorked`', async (): Promise<void> => {
+    const city = await setUpCity(),
       tile = city.tile();
 
     expect(city.tilesWorked().length).to.equal(1);

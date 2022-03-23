@@ -13,7 +13,8 @@ export interface ICityRegistry extends IEntityRegistry<City> {
 
 export class CityRegistry
   extends EntityRegistry<City>
-  implements ICityRegistry {
+  implements ICityRegistry
+{
   constructor() {
     super(City);
   }

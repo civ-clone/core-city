@@ -3,5 +3,5 @@ import City from '../../City';
 export declare const setUpCity: (
   name?: string,
   ruleRegistry?: RuleRegistry
-) => City;
+) => Promise<City>;
 export default setUpCity;

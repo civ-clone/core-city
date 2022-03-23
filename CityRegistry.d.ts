@@ -11,7 +11,8 @@ export interface ICityRegistry extends IEntityRegistry<City> {
 }
 export declare class CityRegistry
   extends EntityRegistry<City>
-  implements ICityRegistry {
+  implements ICityRegistry
+{
   constructor();
   getByPlayer(player: Player): City[];
   getByTile(tile: Tile): City[];

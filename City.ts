@@ -138,6 +138,9 @@ export class City extends DataObject implements ICity {
         this,
         tilesetYields
       );
+    }
+
+    for (const cityYield of tilesetYields) {
       (this.#ruleRegistry as ICostRegistry).process(
         Cost,
         cityYield,
