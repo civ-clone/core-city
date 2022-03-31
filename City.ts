@@ -11,10 +11,7 @@ import {
   instance as ruleRegistryInstance,
 } from '@civ-clone/core-rule/RuleRegistry';
 import { Yield as YieldRule, IYieldRegistry } from './Rules/Yield';
-import {
-  YieldRegistry,
-  instance as yieldRegistryInstance,
-} from '@civ-clone/core-yield/YieldRegistry';
+import { YieldModifier, IYieldModifierRegistry } from './Rules/YieldModifier';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
@@ -29,7 +26,7 @@ export interface ICity extends IDataObject {
   tile(): Tile;
   tiles(): Tileset;
   tilesWorked(): Tileset;
-  yields(yields: typeof Yield[], yieldRegistry: YieldRegistry): Yield[];
+  yields(): Yield[];
 }
 
 export class City extends DataObject implements ICity {
@@ -40,14 +37,12 @@ export class City extends DataObject implements ICity {
   #tile: Tile;
   #tiles: Tileset;
   #tilesWorked: Tileset = new Tileset();
-  #yieldRegistry: YieldRegistry;
 
   constructor(
     player: Player,
     tile: Tile,
     name: string,
-    ruleRegistry: RuleRegistry = ruleRegistryInstance,
-    yieldRegistry: YieldRegistry = yieldRegistryInstance
+    ruleRegistry: RuleRegistry = ruleRegistryInstance
   ) {
     super();
 
@@ -57,9 +52,9 @@ export class City extends DataObject implements ICity {
     this.#tile = tile;
     // TODO: have this controlled via `Rule`s to match original (removing indices 0, 4, 20, 24)
     this.#tiles = this.#tile.getSurroundingArea();
+    // TODO: need a `WorkedTilesRegistry` so that two cities (from any players) cannot work the same `Tile`.
     this.#tilesWorked.push(tile);
     this.#ruleRegistry = ruleRegistry;
-    this.#yieldRegistry = yieldRegistry;
 
     (this.#ruleRegistry as ICreatedRegistry).process(Created, this);
 
@@ -120,36 +115,36 @@ export class City extends DataObject implements ICity {
     return this.#tilesWorked;
   }
 
-  yields(
-    yields: typeof Yield[] = [],
-    yieldRegistry: YieldRegistry = this.#yieldRegistry
-  ): Yield[] {
-    if (yields.length === 0) {
-      yields = yieldRegistry.entries();
-    }
+  yields(): Yield[] {
+    const yields: Yield[] = [];
 
-    const tilesetYields = this.#tilesWorked.yields(this.#player, yields);
+    [
+      (this.#ruleRegistry as IYieldRegistry).get(YieldRule),
+      (this.#ruleRegistry as IYieldModifierRegistry).get(YieldModifier),
+      (this.#ruleRegistry as ICostRegistry).get(Cost),
+    ]
+      .flat()
+      .forEach((rule) => {
+        if (!rule.validate(this, yields)) {
+          return;
+        }
 
-    // Do for...of so that as yields are added, they too are processed.
-    for (const cityYield of tilesetYields) {
-      (this.#ruleRegistry as IYieldRegistry).process(
-        YieldRule,
-        cityYield,
-        this,
-        tilesetYields
-      );
-    }
+        const cityYields = rule.process(this, yields);
 
-    for (const cityYield of tilesetYields) {
-      (this.#ruleRegistry as ICostRegistry).process(
-        Cost,
-        cityYield,
-        this,
-        tilesetYields
-      );
-    }
+        if (!cityYields) {
+          return;
+        }
 
-    return tilesetYields;
+        if (cityYields instanceof Yield) {
+          yields.push(cityYields);
+
+          return;
+        }
+
+        cityYields.forEach((cityYield) => yields.push(cityYield));
+      });
+
+    return yields;
   }
 }
 

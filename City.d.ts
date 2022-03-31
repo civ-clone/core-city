@@ -3,7 +3,6 @@ import {
   IDataObject,
 } from '@civ-clone/core-data-object/DataObject';
 import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
-import { YieldRegistry } from '@civ-clone/core-yield/YieldRegistry';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
@@ -17,7 +16,7 @@ export interface ICity extends IDataObject {
   tile(): Tile;
   tiles(): Tileset;
   tilesWorked(): Tileset;
-  yields(yields: typeof Yield[], yieldRegistry: YieldRegistry): Yield[];
+  yields(): Yield[];
 }
 export declare class City extends DataObject implements ICity {
   #private;
@@ -25,8 +24,7 @@ export declare class City extends DataObject implements ICity {
     player: Player,
     tile: Tile,
     name: string,
-    ruleRegistry?: RuleRegistry,
-    yieldRegistry?: YieldRegistry
+    ruleRegistry?: RuleRegistry
   );
   capture(capturingPlayer: Player): void;
   destroy(player?: Player | null): void;
@@ -37,6 +35,6 @@ export declare class City extends DataObject implements ICity {
   tile(): Tile;
   tiles(): Tileset;
   tilesWorked(): Tileset;
-  yields(yields?: typeof Yield[], yieldRegistry?: YieldRegistry): Yield[];
+  yields(): Yield[];
 }
 export default City;

@@ -5,9 +5,9 @@ import YieldValue from '@civ-clone/core-yield/Yield';
 
 type YieldArgs = [City, YieldValue[]];
 
-export class Yield extends Rule<YieldArgs, YieldValue | YieldValue[]> {}
+export class YieldModifier extends Rule<YieldArgs, YieldValue | YieldValue[]> {}
 
-export default Yield;
+export default YieldModifier;
 
-export interface IYieldRegistry
-  extends IRuleRegistry<Yield, YieldArgs, YieldValue | YieldValue[]> {}
+export interface IYieldModifierRegistry
+  extends IRuleRegistry<YieldModifier, YieldArgs, YieldValue | YieldValue[]> {}

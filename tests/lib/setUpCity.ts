@@ -13,6 +13,11 @@ export const setUpCity: (
   name: string = 'city',
   ruleRegistry: RuleRegistry = ruleRegistryInstance
 ): Promise<City> =>
-  new City(new Player(), await generateTile(), name, ruleRegistry);
+  new City(
+    new Player(ruleRegistry),
+    await generateTile(ruleRegistry),
+    name,
+    ruleRegistry
+  );
 
 export default setUpCity;

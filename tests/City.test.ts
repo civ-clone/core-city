@@ -6,41 +6,53 @@ import * as spies from 'chai-spies';
 import setUpCity from './lib/setUpCity';
 import Player from '@civ-clone/core-player/Player';
 import Destroyed from '../Rules/Destroyed';
-import Yield from '@civ-clone/core-yield/Yield';
+import Yield from '../Rules/Yield';
+import YieldValue from '@civ-clone/core-yield/Yield';
+import YieldModifier from '../Rules/YieldModifier';
+import City from '../City';
+import Cost from '../Rules/Cost';
+import Created from '../Rules/Created';
+import { reduceYield } from '@civ-clone/core-yield/lib/reduceYields';
+import Rule from '@civ-clone/core-rule/Rule';
 
 const { expect, use } = chai;
 
 use(spies);
 
 describe('City', (): void => {
-  it('should process `Captured` `Rule`s on `capture`', async (): Promise<void> => {
+  it('should process `Created`, `Destroyed` and `Captured` `Rule`s', async (): Promise<void> => {
     const ruleRegistry = new RuleRegistry(),
-      spy = chai.spy(),
-      city = await setUpCity('', ruleRegistry),
-      originalPlayer = city.player(),
-      player = new Player();
+      destroyedSpy = chai.spy(),
+      createdSpy = chai.spy(),
+      capturedSpy = chai.spy(),
+      capturingPlayer = new Player(ruleRegistry),
+      destroyingPlayer = new Player(ruleRegistry);
 
-    ruleRegistry.register(new Captured(new Effect(spy)));
+    ruleRegistry.register(
+      new Captured(new Effect(capturedSpy)),
+      new Created(new Effect(createdSpy)),
+      new Destroyed(new Effect(destroyedSpy))
+    );
 
-    expect(player).to.not.equal(originalPlayer);
+    [destroyedSpy, createdSpy, capturedSpy].forEach(
+      (spy) => expect(spy).not.called
+    );
 
-    city.capture(player);
+    const city = await setUpCity('city #1', ruleRegistry),
+      originalPlayer = city.player();
 
-    expect(spy).to.called.once;
-    expect(city.player()).to.equal(player);
+    expect(createdSpy).called.with(city);
     expect(city.originalPlayer()).to.equal(originalPlayer);
-  });
 
-  it('should process `Destroyed` `Rule`s on `destroy`', async (): Promise<void> => {
-    const ruleRegistry = new RuleRegistry(),
-      spy = chai.spy(),
-      city = await setUpCity('', ruleRegistry);
+    city.capture(capturingPlayer);
 
-    ruleRegistry.register(new Destroyed(new Effect(spy)));
+    expect(capturedSpy).called.with(city, capturingPlayer, originalPlayer);
+    expect(city.player()).to.equal(capturingPlayer);
+    expect(city.originalPlayer()).to.equal(originalPlayer);
 
-    city.destroy();
+    city.destroy(destroyingPlayer);
 
-    expect(spy).to.called.once;
+    expect(destroyedSpy).to.called.with(city, destroyingPlayer);
   });
 
   it('should be possible to rename the city', async (): Promise<void> => {
@@ -54,18 +66,47 @@ describe('City', (): void => {
   });
 
   it('should be possible to get yields via `tilesWorked`', async (): Promise<void> => {
-    const city = await setUpCity(),
+    const ruleRegistry = new RuleRegistry(),
+      city = await setUpCity('name', ruleRegistry),
       tile = city.tile();
+
+    ruleRegistry.register(new Yield(new Effect(() => new YieldValue(2))));
 
     expect(city.tilesWorked().length).to.equal(1);
     expect(city.tilesWorked()).to.include(tile);
 
-    tile.yields = () => [new Yield(2)];
-
     const yields = city.yields();
 
     expect(yields.length).to.equal(1);
-    expect(yields[0]).to.instanceof(Yield);
+    expect(yields[0]).to.instanceof(YieldValue);
     expect(yields[0].value()).to.equal(2);
+  });
+
+  it('should correctly return the expected `Yield`s, applying `YieldModifier`s and `Cost`s', async (): Promise<void> => {
+    const ruleRegistry = new RuleRegistry(),
+      city = await setUpCity('name', ruleRegistry);
+
+    (
+      [
+        [new Yield(new Effect(() => new YieldValue(3, 'BaseValue'))), 3],
+        [
+          new YieldModifier(
+            new Effect(
+              (city: City, yields: YieldValue[]) =>
+                new YieldValue(
+                  Math.floor(reduceYield(yields, YieldValue) * 0.5),
+                  'Modifier'
+                )
+            )
+          ),
+          4,
+        ],
+        [new Cost(new Effect(() => new YieldValue(-1, 'Reduction'))), 3],
+      ] as [Rule, number][]
+    ).forEach(([rule, expectedValue]) => {
+      ruleRegistry.register(rule);
+
+      expect(reduceYield(city.yields(), YieldValue)).equal(expectedValue);
+    });
   });
 });

@@ -10,7 +10,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _City_name, _City_originalPlayer, _City_player, _City_ruleRegistry, _City_tile, _City_tiles, _City_tilesWorked, _City_yieldRegistry;
+var _City_name, _City_originalPlayer, _City_player, _City_ruleRegistry, _City_tile, _City_tiles, _City_tilesWorked;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.City = void 0;
 const Captured_1 = require("./Rules/Captured");
@@ -20,10 +20,11 @@ const DataObject_1 = require("@civ-clone/core-data-object/DataObject");
 const Destroyed_1 = require("./Rules/Destroyed");
 const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
 const Yield_1 = require("./Rules/Yield");
-const YieldRegistry_1 = require("@civ-clone/core-yield/YieldRegistry");
+const YieldModifier_1 = require("./Rules/YieldModifier");
 const Tileset_1 = require("@civ-clone/core-world/Tileset");
+const Yield_2 = require("@civ-clone/core-yield/Yield");
 class City extends DataObject_1.DataObject {
-    constructor(player, tile, name, ruleRegistry = RuleRegistry_1.instance, yieldRegistry = YieldRegistry_1.instance) {
+    constructor(player, tile, name, ruleRegistry = RuleRegistry_1.instance) {
         super();
         _City_name.set(this, void 0);
         _City_originalPlayer.set(this, void 0);
@@ -32,16 +33,15 @@ class City extends DataObject_1.DataObject {
         _City_tile.set(this, void 0);
         _City_tiles.set(this, void 0);
         _City_tilesWorked.set(this, new Tileset_1.default());
-        _City_yieldRegistry.set(this, void 0);
         __classPrivateFieldSet(this, _City_name, name, "f");
         __classPrivateFieldSet(this, _City_originalPlayer, player, "f");
         __classPrivateFieldSet(this, _City_player, player, "f");
         __classPrivateFieldSet(this, _City_tile, tile, "f");
         // TODO: have this controlled via `Rule`s to match original (removing indices 0, 4, 20, 24)
         __classPrivateFieldSet(this, _City_tiles, __classPrivateFieldGet(this, _City_tile, "f").getSurroundingArea(), "f");
+        // TODO: need a `WorkedTilesRegistry` so that two cities (from any players) cannot work the same `Tile`.
         __classPrivateFieldGet(this, _City_tilesWorked, "f").push(tile);
         __classPrivateFieldSet(this, _City_ruleRegistry, ruleRegistry, "f");
-        __classPrivateFieldSet(this, _City_yieldRegistry, yieldRegistry, "f");
         __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Created_1.Created, this);
         this.addKey('name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
     }
@@ -75,22 +75,32 @@ class City extends DataObject_1.DataObject {
     tilesWorked() {
         return __classPrivateFieldGet(this, _City_tilesWorked, "f");
     }
-    yields(yields = [], yieldRegistry = __classPrivateFieldGet(this, _City_yieldRegistry, "f")) {
-        if (yields.length === 0) {
-            yields = yieldRegistry.entries();
-        }
-        const tilesetYields = __classPrivateFieldGet(this, _City_tilesWorked, "f").yields(__classPrivateFieldGet(this, _City_player, "f"), yields);
-        // Do for...of so that as yields are added, they too are processed.
-        for (const cityYield of tilesetYields) {
-            __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Yield_1.Yield, cityYield, this, tilesetYields);
-        }
-        for (const cityYield of tilesetYields) {
-            __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Cost_1.Cost, cityYield, this, tilesetYields);
-        }
-        return tilesetYields;
+    yields() {
+        const yields = [];
+        [
+            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(Yield_1.Yield),
+            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(YieldModifier_1.YieldModifier),
+            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(Cost_1.Cost),
+        ]
+            .flat()
+            .forEach((rule) => {
+            if (!rule.validate(this, yields)) {
+                return;
+            }
+            const cityYields = rule.process(this, yields);
+            if (!cityYields) {
+                return;
+            }
+            if (cityYields instanceof Yield_2.default) {
+                yields.push(cityYields);
+                return;
+            }
+            cityYields.forEach((cityYield) => yields.push(cityYield));
+        });
+        return yields;
     }
 }
 exports.City = City;
-_City_name = new WeakMap(), _City_originalPlayer = new WeakMap(), _City_player = new WeakMap(), _City_ruleRegistry = new WeakMap(), _City_tile = new WeakMap(), _City_tiles = new WeakMap(), _City_tilesWorked = new WeakMap(), _City_yieldRegistry = new WeakMap();
+_City_name = new WeakMap(), _City_originalPlayer = new WeakMap(), _City_player = new WeakMap(), _City_ruleRegistry = new WeakMap(), _City_tile = new WeakMap(), _City_tiles = new WeakMap(), _City_tilesWorked = new WeakMap();
 exports.default = City;
 //# sourceMappingURL=City.js.map
