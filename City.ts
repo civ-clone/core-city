@@ -1,21 +1,21 @@
-import { Captured, ICapturedRegistry } from './Rules/Captured';
-import { Cost, ICostRegistry } from './Rules/Cost';
-import { Created, ICreatedRegistry } from './Rules/Created';
 import {
   DataObject,
   IDataObject,
 } from '@civ-clone/core-data-object/DataObject';
-import { Destroyed, IDestroyedRegistry } from './Rules/Destroyed';
 import {
   RuleRegistry,
   instance as ruleRegistryInstance,
 } from '@civ-clone/core-rule/RuleRegistry';
-import { Yield as YieldRule, IYieldRegistry } from './Rules/Yield';
-import { YieldModifier, IYieldModifierRegistry } from './Rules/YieldModifier';
+import Captured from './Rules/Captured';
+import Cost from './Rules/Cost';
+import Created from './Rules/Created';
+import Destroyed from './Rules/Destroyed';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
 import Yield from '@civ-clone/core-yield/Yield';
+import YieldRule from './Rules/Yield';
+import YieldModifier from './Rules/YieldModifier';
 
 export interface ICity extends IDataObject {
   capture(player: Player): void;
@@ -56,7 +56,7 @@ export class City extends DataObject implements ICity {
     this.#tilesWorked.push(tile);
     this.#ruleRegistry = ruleRegistry;
 
-    (this.#ruleRegistry as ICreatedRegistry).process(Created, this);
+    this.#ruleRegistry.process(Created, this);
 
     this.addKey(
       'name',
@@ -75,16 +75,11 @@ export class City extends DataObject implements ICity {
 
     this.#player = capturingPlayer;
 
-    (this.#ruleRegistry as ICapturedRegistry).process(
-      Captured,
-      this,
-      capturingPlayer,
-      player
-    );
+    this.#ruleRegistry.process(Captured, this, capturingPlayer, player);
   }
 
   destroy(player: Player | null = null): void {
-    (this.#ruleRegistry as IDestroyedRegistry).process(Destroyed, this, player);
+    this.#ruleRegistry.process(Destroyed, this, player);
   }
 
   name(): string {
@@ -119,9 +114,9 @@ export class City extends DataObject implements ICity {
     const yields: Yield[] = [];
 
     [
-      (this.#ruleRegistry as IYieldRegistry).get(YieldRule),
-      (this.#ruleRegistry as IYieldModifierRegistry).get(YieldModifier),
-      (this.#ruleRegistry as ICostRegistry).get(Cost),
+      this.#ruleRegistry.get(YieldRule),
+      this.#ruleRegistry.get(YieldModifier),
+      this.#ruleRegistry.get(Cost),
     ]
       .flat()
       .forEach((rule) => {
@@ -141,7 +136,7 @@ export class City extends DataObject implements ICity {
           return;
         }
 
-        cityYields.forEach((cityYield) => yields.push(cityYield));
+        cityYields.forEach((cityYield: Yield) => yields.push(cityYield));
       });
 
     return yields;

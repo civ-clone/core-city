@@ -8,7 +8,7 @@ import Tile from '@civ-clone/core-world/Tile';
 
 export interface ICityRegistry extends IEntityRegistry<City> {
   getByPlayer(player: Player): City[];
-  getByTile(tile: Tile): City[];
+  getByTile(tile: Tile): City | null;
 }
 
 export class CityRegistry
@@ -23,8 +23,10 @@ export class CityRegistry
     return this.filter((city: City): boolean => city.player() === player);
   }
 
-  getByTile(tile: Tile): City[] {
-    return this.filter((city: City): boolean => city.tile() === tile);
+  getByTile(tile: Tile): City | null {
+    const [city] = this.filter((city: City): boolean => city.tile() === tile);
+
+    return city ?? null;
   }
 }
 

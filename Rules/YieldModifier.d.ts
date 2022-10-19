@@ -1,5 +1,4 @@
 import City from '../City';
-import { IRuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
 import Rule from '@civ-clone/core-rule/Rule';
 import YieldValue from '@civ-clone/core-yield/Yield';
 declare type YieldArgs = [City, YieldValue[]];
@@ -8,5 +7,3 @@ export declare class YieldModifier extends Rule<
   YieldValue | YieldValue[]
 > {}
 export default YieldModifier;
-export interface IYieldModifierRegistry
-  extends IRuleRegistry<YieldModifier, YieldArgs, YieldValue | YieldValue[]> {}

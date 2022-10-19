@@ -11,7 +11,8 @@ class CityRegistry extends EntityRegistry_1.EntityRegistry {
         return this.filter((city) => city.player() === player);
     }
     getByTile(tile) {
-        return this.filter((city) => city.tile() === tile);
+        const [city] = this.filter((city) => city.tile() === tile);
+        return city !== null && city !== void 0 ? city : null;
     }
 }
 exports.CityRegistry = CityRegistry;

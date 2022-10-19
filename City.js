@@ -13,16 +13,16 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var _City_name, _City_originalPlayer, _City_player, _City_ruleRegistry, _City_tile, _City_tiles, _City_tilesWorked;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.City = void 0;
+const DataObject_1 = require("@civ-clone/core-data-object/DataObject");
+const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
 const Captured_1 = require("./Rules/Captured");
 const Cost_1 = require("./Rules/Cost");
 const Created_1 = require("./Rules/Created");
-const DataObject_1 = require("@civ-clone/core-data-object/DataObject");
 const Destroyed_1 = require("./Rules/Destroyed");
-const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
-const Yield_1 = require("./Rules/Yield");
-const YieldModifier_1 = require("./Rules/YieldModifier");
 const Tileset_1 = require("@civ-clone/core-world/Tileset");
-const Yield_2 = require("@civ-clone/core-yield/Yield");
+const Yield_1 = require("@civ-clone/core-yield/Yield");
+const Yield_2 = require("./Rules/Yield");
+const YieldModifier_1 = require("./Rules/YieldModifier");
 class City extends DataObject_1.DataObject {
     constructor(player, tile, name, ruleRegistry = RuleRegistry_1.instance) {
         super();
@@ -42,17 +42,17 @@ class City extends DataObject_1.DataObject {
         // TODO: need a `WorkedTilesRegistry` so that two cities (from any players) cannot work the same `Tile`.
         __classPrivateFieldGet(this, _City_tilesWorked, "f").push(tile);
         __classPrivateFieldSet(this, _City_ruleRegistry, ruleRegistry, "f");
-        __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Created_1.Created, this);
+        __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Created_1.default, this);
         this.addKey('name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
     }
     capture(capturingPlayer) {
         // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
         const player = __classPrivateFieldGet(this, _City_player, "f");
         __classPrivateFieldSet(this, _City_player, capturingPlayer, "f");
-        __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Captured_1.Captured, this, capturingPlayer, player);
+        __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Captured_1.default, this, capturingPlayer, player);
     }
     destroy(player = null) {
-        __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Destroyed_1.Destroyed, this, player);
+        __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Destroyed_1.default, this, player);
     }
     name() {
         return __classPrivateFieldGet(this, _City_name, "f");
@@ -78,9 +78,9 @@ class City extends DataObject_1.DataObject {
     yields() {
         const yields = [];
         [
-            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(Yield_1.Yield),
-            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(YieldModifier_1.YieldModifier),
-            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(Cost_1.Cost),
+            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(Yield_2.default),
+            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(YieldModifier_1.default),
+            __classPrivateFieldGet(this, _City_ruleRegistry, "f").get(Cost_1.default),
         ]
             .flat()
             .forEach((rule) => {
@@ -91,7 +91,7 @@ class City extends DataObject_1.DataObject {
             if (!cityYields) {
                 return;
             }
-            if (cityYields instanceof Yield_2.default) {
+            if (cityYields instanceof Yield_1.default) {
                 yields.push(cityYields);
                 return;
             }

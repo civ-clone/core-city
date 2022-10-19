@@ -12,10 +12,8 @@ export const getAdditionalData = (
   new AdditionalData(Player, 'cities', (player: Player) =>
     cityRegistry.getByPlayer(player)
   ),
-  new AdditionalData(
-    Tile,
-    'city',
-    (tile: Tile) => cityRegistry.getByTile(tile)[0] || null
+  new AdditionalData(Tile, 'city', (tile: Tile) =>
+    cityRegistry.getByTile(tile)
   ),
 ];
 

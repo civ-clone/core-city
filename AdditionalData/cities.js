@@ -7,7 +7,7 @@ const Player_1 = require("@civ-clone/core-player/Player");
 const Tile_1 = require("@civ-clone/core-world/Tile");
 const getAdditionalData = (cityRegistry = CityRegistry_1.instance) => [
     new AdditionalData_1.default(Player_1.default, 'cities', (player) => cityRegistry.getByPlayer(player)),
-    new AdditionalData_1.default(Tile_1.default, 'city', (tile) => cityRegistry.getByTile(tile)[0] || null),
+    new AdditionalData_1.default(Tile_1.default, 'city', (tile) => cityRegistry.getByTile(tile)),
 ];
 exports.getAdditionalData = getAdditionalData;
 exports.default = exports.getAdditionalData;
