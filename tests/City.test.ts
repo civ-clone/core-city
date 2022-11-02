@@ -1,30 +1,28 @@
+import { expect, spy, use } from 'chai';
 import Captured from '../Rules/Captured';
-import Effect from '@civ-clone/core-rule/Effect';
-import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import setUpCity from './lib/setUpCity';
-import Player from '@civ-clone/core-player/Player';
-import Destroyed from '../Rules/Destroyed';
-import Yield from '../Rules/Yield';
-import YieldValue from '@civ-clone/core-yield/Yield';
-import YieldModifier from '../Rules/YieldModifier';
 import City from '../City';
 import Cost from '../Rules/Cost';
 import Created from '../Rules/Created';
-import { reduceYield } from '@civ-clone/core-yield/lib/reduceYields';
+import Destroyed from '../Rules/Destroyed';
+import Effect from '@civ-clone/core-rule/Effect';
+import Player from '@civ-clone/core-player/Player';
 import Rule from '@civ-clone/core-rule/Rule';
-
-const { expect, use } = chai;
+import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
+import Yield from '../Rules/Yield';
+import YieldModifier from '../Rules/YieldModifier';
+import YieldValue from '@civ-clone/core-yield/Yield';
+import { reduceYield } from '@civ-clone/core-yield/lib/reduceYields';
+import setUpCity from './lib/setUpCity';
+import * as spies from 'chai-spies';
 
 use(spies);
 
 describe('City', (): void => {
   it('should process `Created`, `Destroyed` and `Captured` `Rule`s', async (): Promise<void> => {
     const ruleRegistry = new RuleRegistry(),
-      destroyedSpy = chai.spy(),
-      createdSpy = chai.spy(),
-      capturedSpy = chai.spy(),
+      destroyedSpy = spy(),
+      createdSpy = spy(),
+      capturedSpy = spy(),
       capturingPlayer = new Player(ruleRegistry),
       destroyingPlayer = new Player(ruleRegistry);
 
