@@ -7,11 +7,14 @@ class CityRegistry extends EntityRegistry_1.EntityRegistry {
     constructor() {
         super(City_1.default);
     }
-    getByPlayer(player) {
-        return this.filter((city) => city.player() === player);
+    getByPlayer(player, includeDestroyed = false) {
+        if (includeDestroyed) {
+            return this.getBy('player', player);
+        }
+        return this.filter((city) => city.player() === player && !city.destroyed());
     }
     getByTile(tile) {
-        const [city] = this.filter((city) => city.tile() === tile);
+        const [city] = this.filter((city) => city.tile() === tile && !city.destroyed());
         return city !== null && city !== void 0 ? city : null;
     }
 }

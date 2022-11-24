@@ -20,6 +20,7 @@ import YieldModifier from './Rules/YieldModifier';
 export interface ICity extends IDataObject {
   capture(player: Player): void;
   destroy(player: Player | null): void;
+  destroyed(): boolean;
   name(): string;
   originalPlayer(): Player;
   player(): Player;
@@ -30,6 +31,7 @@ export interface ICity extends IDataObject {
 }
 
 export class City extends DataObject implements ICity {
+  #destroyed: boolean = false;
   #name: string;
   #originalPlayer: Player;
   #player: Player;
@@ -59,6 +61,7 @@ export class City extends DataObject implements ICity {
     this.#ruleRegistry.process(Created, this);
 
     this.addKey(
+      'destroyed',
       'name',
       'originalPlayer',
       'player',
@@ -79,7 +82,13 @@ export class City extends DataObject implements ICity {
   }
 
   destroy(player: Player | null = null): void {
+    this.#destroyed = true;
+
     this.#ruleRegistry.process(Destroyed, this, player);
+  }
+
+  destroyed(): boolean {
+    return this.#destroyed;
   }
 
   name(): string {

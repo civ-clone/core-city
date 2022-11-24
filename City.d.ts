@@ -10,6 +10,7 @@ import Yield from '@civ-clone/core-yield/Yield';
 export interface ICity extends IDataObject {
   capture(player: Player): void;
   destroy(player: Player | null): void;
+  destroyed(): boolean;
   name(): string;
   originalPlayer(): Player;
   player(): Player;
@@ -28,6 +29,7 @@ export declare class City extends DataObject implements ICity {
   );
   capture(capturingPlayer: Player): void;
   destroy(player?: Player | null): void;
+  destroyed(): boolean;
   name(): string;
   setName(name: string): void;
   originalPlayer(): Player;

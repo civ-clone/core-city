@@ -10,7 +10,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _City_name, _City_originalPlayer, _City_player, _City_ruleRegistry, _City_tile, _City_tiles, _City_tilesWorked;
+var _City_destroyed, _City_name, _City_originalPlayer, _City_player, _City_ruleRegistry, _City_tile, _City_tiles, _City_tilesWorked;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.City = void 0;
 const DataObject_1 = require("@civ-clone/core-data-object/DataObject");
@@ -26,6 +26,7 @@ const YieldModifier_1 = require("./Rules/YieldModifier");
 class City extends DataObject_1.DataObject {
     constructor(player, tile, name, ruleRegistry = RuleRegistry_1.instance) {
         super();
+        _City_destroyed.set(this, false);
         _City_name.set(this, void 0);
         _City_originalPlayer.set(this, void 0);
         _City_player.set(this, void 0);
@@ -43,7 +44,7 @@ class City extends DataObject_1.DataObject {
         __classPrivateFieldGet(this, _City_tilesWorked, "f").push(tile);
         __classPrivateFieldSet(this, _City_ruleRegistry, ruleRegistry, "f");
         __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Created_1.default, this);
-        this.addKey('name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
+        this.addKey('destroyed', 'name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
     }
     capture(capturingPlayer) {
         // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
@@ -52,7 +53,11 @@ class City extends DataObject_1.DataObject {
         __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Captured_1.default, this, capturingPlayer, player);
     }
     destroy(player = null) {
+        __classPrivateFieldSet(this, _City_destroyed, true, "f");
         __classPrivateFieldGet(this, _City_ruleRegistry, "f").process(Destroyed_1.default, this, player);
+    }
+    destroyed() {
+        return __classPrivateFieldGet(this, _City_destroyed, "f");
     }
     name() {
         return __classPrivateFieldGet(this, _City_name, "f");
@@ -101,6 +106,6 @@ class City extends DataObject_1.DataObject {
     }
 }
 exports.City = City;
-_City_name = new WeakMap(), _City_originalPlayer = new WeakMap(), _City_player = new WeakMap(), _City_ruleRegistry = new WeakMap(), _City_tile = new WeakMap(), _City_tiles = new WeakMap(), _City_tilesWorked = new WeakMap();
+_City_destroyed = new WeakMap(), _City_name = new WeakMap(), _City_originalPlayer = new WeakMap(), _City_player = new WeakMap(), _City_ruleRegistry = new WeakMap(), _City_tile = new WeakMap(), _City_tiles = new WeakMap(), _City_tilesWorked = new WeakMap();
 exports.default = City;
 //# sourceMappingURL=City.js.map

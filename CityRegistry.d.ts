@@ -6,7 +6,7 @@ import City from './City';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 export interface ICityRegistry extends IEntityRegistry<City> {
-  getByPlayer(player: Player): City[];
+  getByPlayer(player: Player, includeDestroyed?: boolean): City[];
   getByTile(tile: Tile): City | null;
 }
 export declare class CityRegistry
@@ -14,7 +14,7 @@ export declare class CityRegistry
   implements ICityRegistry
 {
   constructor();
-  getByPlayer(player: Player): City[];
+  getByPlayer(player: Player, includeDestroyed?: boolean): City[];
   getByTile(tile: Tile): City | null;
 }
 export declare const instance: CityRegistry;

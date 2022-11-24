@@ -7,7 +7,7 @@ import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 
 export interface ICityRegistry extends IEntityRegistry<City> {
-  getByPlayer(player: Player): City[];
+  getByPlayer(player: Player, includeDestroyed?: boolean): City[];
   getByTile(tile: Tile): City | null;
 }
 
@@ -19,12 +19,20 @@ export class CityRegistry
     super(City);
   }
 
-  getByPlayer(player: Player): City[] {
-    return this.filter((city: City): boolean => city.player() === player);
+  getByPlayer(player: Player, includeDestroyed: boolean = false): City[] {
+    if (includeDestroyed) {
+      return this.getBy('player', player);
+    }
+
+    return this.filter(
+      (city: City): boolean => city.player() === player && !city.destroyed()
+    );
   }
 
   getByTile(tile: Tile): City | null {
-    const [city] = this.filter((city: City): boolean => city.tile() === tile);
+    const [city] = this.filter(
+      (city: City): boolean => city.tile() === tile && !city.destroyed()
+    );
 
     return city ?? null;
   }
