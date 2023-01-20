@@ -3,6 +3,7 @@ import {
   IDataObject,
 } from '@civ-clone/core-data-object/DataObject';
 import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
+import { WorkedTileRegistry } from './WorkedTileRegistry';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
@@ -25,7 +26,8 @@ export declare class City extends DataObject implements ICity {
     player: Player,
     tile: Tile,
     name: string,
-    ruleRegistry?: RuleRegistry
+    ruleRegistry?: RuleRegistry,
+    workedTileRegistry?: WorkedTileRegistry
   );
   capture(capturingPlayer: Player): void;
   destroy(player?: Player | null): void;

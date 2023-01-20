@@ -6,13 +6,19 @@ import {
   RuleRegistry,
   instance as ruleRegistryInstance,
 } from '@civ-clone/core-rule/RuleRegistry';
+import {
+  WorkedTileRegistry,
+  instance as workedTileRegistryInstance,
+} from './WorkedTileRegistry';
 import Captured from './Rules/Captured';
+import Tiles from './Rules/Tiles';
 import Cost from './Rules/Cost';
 import Created from './Rules/Created';
 import Destroyed from './Rules/Destroyed';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
+import WorkedTile from './WorkedTile';
 import Yield from '@civ-clone/core-yield/Yield';
 import YieldRule from './Rules/Yield';
 import YieldModifier from './Rules/YieldModifier';
@@ -38,13 +44,14 @@ export class City extends DataObject implements ICity {
   #ruleRegistry: RuleRegistry;
   #tile: Tile;
   #tiles: Tileset;
-  #tilesWorked: Tileset = new Tileset();
+  #workedTileRegistry: WorkedTileRegistry;
 
   constructor(
     player: Player,
     tile: Tile,
     name: string,
-    ruleRegistry: RuleRegistry = ruleRegistryInstance
+    ruleRegistry: RuleRegistry = ruleRegistryInstance,
+    workedTileRegistry: WorkedTileRegistry = workedTileRegistryInstance
   ) {
     super();
 
@@ -52,11 +59,10 @@ export class City extends DataObject implements ICity {
     this.#originalPlayer = player;
     this.#player = player;
     this.#tile = tile;
-    // TODO: have this controlled via `Rule`s to match original (removing indices 0, 4, 20, 24)
-    this.#tiles = this.#tile.getSurroundingArea();
-    // TODO: need a `WorkedTilesRegistry` so that two cities (from any players) cannot work the same `Tile`.
-    this.#tilesWorked.push(tile);
     this.#ruleRegistry = ruleRegistry;
+    this.#workedTileRegistry = workedTileRegistry;
+
+    [this.#tiles] = this.#ruleRegistry.process(Tiles, this);
 
     this.#ruleRegistry.process(Created, this);
 
@@ -116,7 +122,7 @@ export class City extends DataObject implements ICity {
   }
 
   tilesWorked(): Tileset {
-    return this.#tilesWorked;
+    return this.#workedTileRegistry.getTilesByCity(this);
   }
 
   yields(): Yield[] {
