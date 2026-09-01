@@ -1,16 +1,4 @@
 "use strict";
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _WorkedTileRegistry_ruleRegistry;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.instance = exports.WorkedTileRegistry = void 0;
 const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
@@ -21,8 +9,7 @@ const WorkedTile_1 = require("./WorkedTile");
 class WorkedTileRegistry extends EntityRegistry_1.default {
     constructor(ruleRegistry = RuleRegistry_1.instance) {
         super(WorkedTile_1.default);
-        _WorkedTileRegistry_ruleRegistry.set(this, void 0);
-        __classPrivateFieldSet(this, _WorkedTileRegistry_ruleRegistry, ruleRegistry, "f");
+        this._ruleRegistry = ruleRegistry;
     }
     getByCity(city) {
         return this.getBy('city', city);
@@ -44,7 +31,7 @@ class WorkedTileRegistry extends EntityRegistry_1.default {
         });
     }
     tileCanBeWorkedBy(tile, city) {
-        return __classPrivateFieldGet(this, _WorkedTileRegistry_ruleRegistry, "f")
+        return this._ruleRegistry
             .process(CanBeWorked_1.default, tile, city)
             .every((result) => result);
     }
@@ -60,7 +47,6 @@ class WorkedTileRegistry extends EntityRegistry_1.default {
     }
 }
 exports.WorkedTileRegistry = WorkedTileRegistry;
-_WorkedTileRegistry_ruleRegistry = new WeakMap();
 exports.instance = new WorkedTileRegistry();
 exports.default = WorkedTileRegistry;
 //# sourceMappingURL=WorkedTileRegistry.js.map

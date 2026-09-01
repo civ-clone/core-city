@@ -37,14 +37,14 @@ export interface ICity extends IDataObject {
 }
 
 export class City extends DataObject implements ICity {
-  #destroyed: boolean = false;
-  #name: string;
-  #originalPlayer: Player;
-  #player: Player;
-  #ruleRegistry: RuleRegistry;
-  #tile: Tile;
-  #tiles: Tileset;
-  #workedTileRegistry: WorkedTileRegistry;
+  private _destroyed: boolean = false;
+  private _name: string;
+  private _originalPlayer: Player;
+  private _player: Player;
+  private _ruleRegistry: RuleRegistry;
+  private _tile: Tile;
+  private _tiles: Tileset;
+  private _workedTileRegistry: WorkedTileRegistry;
 
   constructor(
     player: Player,
@@ -55,16 +55,16 @@ export class City extends DataObject implements ICity {
   ) {
     super();
 
-    this.#name = name;
-    this.#originalPlayer = player;
-    this.#player = player;
-    this.#tile = tile;
-    this.#ruleRegistry = ruleRegistry;
-    this.#workedTileRegistry = workedTileRegistry;
+    this._name = name;
+    this._originalPlayer = player;
+    this._player = player;
+    this._tile = tile;
+    this._ruleRegistry = ruleRegistry;
+    this._workedTileRegistry = workedTileRegistry;
 
-    [this.#tiles] = this.#ruleRegistry.process(Tiles, this);
+    [this._tiles] = this._ruleRegistry.process(Tiles, this);
 
-    this.#ruleRegistry.process(Created, this);
+    this._ruleRegistry.process(Created, this);
 
     this.addKey(
       'destroyed',
@@ -80,58 +80,58 @@ export class City extends DataObject implements ICity {
 
   capture(capturingPlayer: Player): void {
     // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
-    const player = this.#player;
+    const player = this._player;
 
-    this.#player = capturingPlayer;
+    this._player = capturingPlayer;
 
-    this.#ruleRegistry.process(Captured, this, capturingPlayer, player);
+    this._ruleRegistry.process(Captured, this, capturingPlayer, player);
   }
 
   destroy(player: Player | null = null): void {
-    this.#destroyed = true;
+    this._destroyed = true;
 
-    this.#ruleRegistry.process(Destroyed, this, player);
+    this._ruleRegistry.process(Destroyed, this, player);
   }
 
   destroyed(): boolean {
-    return this.#destroyed;
+    return this._destroyed;
   }
 
   name(): string {
-    return this.#name;
+    return this._name;
   }
 
   setName(name: string): void {
-    this.#name = name;
+    this._name = name;
   }
 
   originalPlayer(): Player {
-    return this.#originalPlayer;
+    return this._originalPlayer;
   }
 
   player(): Player {
-    return this.#player;
+    return this._player;
   }
 
   tile(): Tile {
-    return this.#tile;
+    return this._tile;
   }
 
   tiles(): Tileset {
-    return this.#tiles;
+    return this._tiles;
   }
 
   tilesWorked(): Tileset {
-    return this.#workedTileRegistry.getTilesByCity(this);
+    return this._workedTileRegistry.getTilesByCity(this);
   }
 
   yields(): Yield[] {
     const yields: Yield[] = [];
 
     [
-      this.#ruleRegistry.get(YieldRule),
-      this.#ruleRegistry.get(YieldModifier),
-      this.#ruleRegistry.get(Cost),
+      this._ruleRegistry.get(YieldRule),
+      this._ruleRegistry.get(YieldModifier),
+      this._ruleRegistry.get(Cost),
     ]
       .flat()
       .forEach((rule) => {

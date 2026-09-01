@@ -26,12 +26,12 @@ export class WorkedTileRegistry
   extends EntityRegistry<WorkedTile>
   implements IWorkedTileRegistry
 {
-  #ruleRegistry: RuleRegistry;
+  private _ruleRegistry: RuleRegistry;
 
   constructor(ruleRegistry: RuleRegistry = ruleRegistryInstance) {
     super(WorkedTile);
 
-    this.#ruleRegistry = ruleRegistry;
+    this._ruleRegistry = ruleRegistry;
   }
 
   getByCity(city: City): WorkedTile[] {
@@ -66,7 +66,7 @@ export class WorkedTileRegistry
   }
 
   tileCanBeWorkedBy(tile: Tile, city: City): boolean {
-    return this.#ruleRegistry
+    return this._ruleRegistry
       .process(CanBeWorked, tile, city)
       .every((result: boolean): boolean => result);
   }

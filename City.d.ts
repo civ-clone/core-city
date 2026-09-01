@@ -21,7 +21,14 @@ export interface ICity extends IDataObject {
   yields(): Yield[];
 }
 export declare class City extends DataObject implements ICity {
-  #private;
+  private _destroyed;
+  private _name;
+  private _originalPlayer;
+  private _player;
+  private _ruleRegistry;
+  private _tile;
+  private _tiles;
+  private _workedTileRegistry;
   constructor(
     player: Player,
     tile: Tile,

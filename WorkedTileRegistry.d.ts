@@ -19,7 +19,7 @@ export declare class WorkedTileRegistry
   extends EntityRegistry<WorkedTile>
   implements IWorkedTileRegistry
 {
-  #private;
+  private _ruleRegistry;
   constructor(ruleRegistry?: RuleRegistry);
   getByCity(city: City): WorkedTile[];
   getByTile(tile: Tile): WorkedTile | null;

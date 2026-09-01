@@ -3,23 +3,23 @@ import DataObject from '@civ-clone/core-data-object/DataObject';
 import Tile from '@civ-clone/core-world/Tile';
 
 export class WorkedTile extends DataObject {
-  #city: City;
-  #tile: Tile;
+  private _city: City;
+  private _tile: Tile;
   constructor(tile: Tile, city: City) {
     super();
 
-    this.#city = city;
-    this.#tile = tile;
+    this._city = city;
+    this._tile = tile;
 
     this.addKey('city', 'tile');
   }
 
   city(): City {
-    return this.#city;
+    return this._city;
   }
 
   tile(): Tile {
-    return this.#tile;
+    return this._tile;
   }
 }
 

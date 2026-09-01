@@ -2,7 +2,8 @@ import City from './City';
 import DataObject from '@civ-clone/core-data-object/DataObject';
 import Tile from '@civ-clone/core-world/Tile';
 export declare class WorkedTile extends DataObject {
-  #private;
+  private _city;
+  private _tile;
   constructor(tile: Tile, city: City);
   city(): City;
   tile(): Tile;
