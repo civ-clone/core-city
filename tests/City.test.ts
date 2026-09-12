@@ -4,6 +4,8 @@ import City from '../City';
 import Cost from '../Rules/Cost';
 import Created from '../Rules/Created';
 import Destroyed from '../Rules/Destroyed';
+import WorkedTile from '../WorkedTile';
+import { WorkedTileRegistry } from '../WorkedTileRegistry';
 import Effect from '@civ-clone/core-rule/Effect';
 import Player from '@civ-clone/core-player/Player';
 import Rule from '@civ-clone/core-rule/Rule';
@@ -65,8 +67,15 @@ describe('City', (): void => {
 
   it('should be possible to get yields via `tilesWorked`', async (): Promise<void> => {
     const ruleRegistry = new RuleRegistry(),
-      city = await setUpCity('name', ruleRegistry),
+      workedTileRegistry = new WorkedTileRegistry(ruleRegistry),
+      city = await setUpCity('name', ruleRegistry, workedTileRegistry),
       tile = city.tile();
+
+    // Nothing in this package creates a `WorkedTile` — the rules that do live
+    // in `core-city-growth` and the `civ1-*` plugins — so a city built with a
+    // bare `RuleRegistry` works no tiles at all. The test has to supply one,
+    // or it is asserting on whatever the shared singleton happens to hold.
+    workedTileRegistry.register(new WorkedTile(tile, city));
 
     ruleRegistry.register(new Yield(new Effect(() => new YieldValue(2))));
 
