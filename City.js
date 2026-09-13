@@ -86,5 +86,6 @@ class City extends DataObject_1.DataObject {
     }
 }
 exports.City = City;
+City.transient = ['_ruleRegistry', '_workedTileRegistry'];
 exports.default = City;
 //# sourceMappingURL=City.js.map

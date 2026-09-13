@@ -37,6 +37,7 @@ export interface ICity extends IDataObject {
 }
 
 export class City extends DataObject implements ICity {
+  static readonly transient = ['_ruleRegistry', '_workedTileRegistry'];
   private _destroyed: boolean = false;
   private _name: string;
   private _originalPlayer: Player;

@@ -21,6 +21,7 @@ export interface ICity extends IDataObject {
   yields(): Yield[];
 }
 export declare class City extends DataObject implements ICity {
+  static readonly transient: string[];
   private _destroyed;
   private _name;
   private _originalPlayer;
