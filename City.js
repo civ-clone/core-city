@@ -9,6 +9,7 @@ const Tiles_1 = require("./Rules/Tiles");
 const Cost_1 = require("./Rules/Cost");
 const Created_1 = require("./Rules/Created");
 const Destroyed_1 = require("./Rules/Destroyed");
+const Tileset_1 = require("@civ-clone/core-world/Tileset");
 const Yield_1 = require("@civ-clone/core-yield/Yield");
 const Yield_2 = require("./Rules/Yield");
 const YieldModifier_1 = require("./Rules/YieldModifier");
@@ -83,6 +84,27 @@ class City extends DataObject_1.DataObject {
             cityYields.forEach((cityYield) => yields.push(cityYield));
         });
         return yields;
+    }
+    /**
+     * Put the `Tileset` back around the restored tiles.
+     *
+     * `_tiles` is a registry held as a field, and `core-save-game` writes one as
+     * an array of its members — the class around a collection is the one thing
+     * the format cannot record. So a loaded city arrives with a plain `Tile[]`
+     * here and `tiles()` hands back something whose `entries()` is an array
+     * iterator.
+     *
+     * Only the container, deliberately. Recomputing the fat cross from the
+     * `Tiles` rule would be smaller in the file and would read the *world* —
+     * which may not have rebuilt its own tiles yet, since hooks run in no
+     * particular order. A hook that puts its own class back around its own
+     * restored state cannot depend on another one.
+     */
+    onHydrated() {
+        const tiles = this._tiles;
+        if (Array.isArray(tiles)) {
+            this._tiles = Tileset_1.default.from(...tiles);
+        }
     }
 }
 exports.City = City;

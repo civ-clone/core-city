@@ -157,6 +157,29 @@ export class City extends DataObject implements ICity {
 
     return yields;
   }
+
+  /**
+   * Put the `Tileset` back around the restored tiles.
+   *
+   * `_tiles` is a registry held as a field, and `core-save-game` writes one as
+   * an array of its members — the class around a collection is the one thing
+   * the format cannot record. So a loaded city arrives with a plain `Tile[]`
+   * here and `tiles()` hands back something whose `entries()` is an array
+   * iterator.
+   *
+   * Only the container, deliberately. Recomputing the fat cross from the
+   * `Tiles` rule would be smaller in the file and would read the *world* —
+   * which may not have rebuilt its own tiles yet, since hooks run in no
+   * particular order. A hook that puts its own class back around its own
+   * restored state cannot depend on another one.
+   */
+  onHydrated(): void {
+    const tiles = this._tiles as unknown;
+
+    if (Array.isArray(tiles)) {
+      this._tiles = Tileset.from(...(tiles as Tile[]));
+    }
+  }
 }
 
 export default City;
