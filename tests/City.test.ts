@@ -80,7 +80,7 @@ describe('City', (): void => {
     ruleRegistry.register(new Yield(new Effect(() => new YieldValue(2))));
 
     expect(city.tilesWorked().length).to.equal(1);
-    expect(city.tilesWorked()).to.include(tile);
+    expect(city.tilesWorked().entries()).to.include(tile);
 
     const yields = city.yields();
 
