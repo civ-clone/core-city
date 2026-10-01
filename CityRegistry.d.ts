@@ -13,6 +13,7 @@ export declare class CityRegistry
   extends EntityRegistry<City>
   implements ICityRegistry
 {
+  private _byTile;
   constructor();
   getByPlayer(player: Player, includeDestroyed?: boolean): City[];
   getByTile(tile: Tile): City | null;
