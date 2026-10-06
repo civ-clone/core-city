@@ -24,7 +24,7 @@ import YieldRule from './Rules/Yield';
 import YieldModifier from './Rules/YieldModifier';
 
 export interface ICity extends IDataObject {
-  capture(player: Player): void;
+  capture(player: Player, cause?: unknown): void;
   destroy(player: Player | null): void;
   destroyed(): boolean;
   name(): string;
@@ -79,13 +79,17 @@ export class City extends DataObject implements ICity {
     );
   }
 
-  capture(capturingPlayer: Player): void {
+  /**
+   * `cause` says how the city changed hands, for the `Captured` rules that care: what a ruleset passes is up to it (a
+   * Diplomat's incite action, say). A conquest passes nothing.
+   */
+  capture(capturingPlayer: Player, cause: unknown = null): void {
     // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
     const player = this._player;
 
     this._player = capturingPlayer;
 
-    this._ruleRegistry.process(Captured, this, capturingPlayer, player);
+    this._ruleRegistry.process(Captured, this, capturingPlayer, player, cause);
   }
 
   destroy(player: Player | null = null): void {

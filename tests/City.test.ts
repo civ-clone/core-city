@@ -46,9 +46,27 @@ describe('City', (): void => {
 
     city.capture(capturingPlayer);
 
-    expect(capturedSpy).called.with(city, capturingPlayer, originalPlayer);
+    expect(capturedSpy).called.with(
+      city,
+      capturingPlayer,
+      originalPlayer,
+      null
+    );
+
     expect(city.player()).to.equal(capturingPlayer);
     expect(city.originalPlayer()).to.equal(originalPlayer);
+
+    // A capture can say why: the rules are passed the cause.
+    const cause = { reason: 'incite' };
+
+    city.capture(originalPlayer, cause);
+
+    expect(capturedSpy).called.with(
+      city,
+      originalPlayer,
+      capturingPlayer,
+      cause
+    );
 
     city.destroy(destroyingPlayer);
 

@@ -27,11 +27,15 @@ class City extends DataObject_1.DataObject {
         this._ruleRegistry.process(Created_1.default, this);
         this.addKey('destroyed', 'name', 'originalPlayer', 'player', 'tile', 'tiles', 'tilesWorked', 'yields');
     }
-    capture(capturingPlayer) {
+    /**
+     * `cause` says how the city changed hands, for the `Captured` rules that care: what a ruleset passes is up to it (a
+     * Diplomat's incite action, say). A conquest passes nothing.
+     */
+    capture(capturingPlayer, cause = null) {
         // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
         const player = this._player;
         this._player = capturingPlayer;
-        this._ruleRegistry.process(Captured_1.default, this, capturingPlayer, player);
+        this._ruleRegistry.process(Captured_1.default, this, capturingPlayer, player, cause);
     }
     destroy(player = null) {
         this._destroyed = true;
