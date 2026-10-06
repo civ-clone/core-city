@@ -9,7 +9,7 @@ import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
 import Yield from '@civ-clone/core-yield/Yield';
 export interface ICity extends IDataObject {
-  capture(player: Player): void;
+  capture(player: Player, cause?: unknown): void;
   destroy(player: Player | null): void;
   destroyed(): boolean;
   name(): string;
@@ -37,7 +37,11 @@ export declare class City extends DataObject implements ICity {
     ruleRegistry?: RuleRegistry,
     workedTileRegistry?: WorkedTileRegistry
   );
-  capture(capturingPlayer: Player): void;
+  /**
+   * `cause` says how the city changed hands, for the `Captured` rules that care: what a ruleset passes is up to it (a
+   * Diplomat's incite action, say). A conquest passes nothing.
+   */
+  capture(capturingPlayer: Player, cause?: unknown): void;
   destroy(player?: Player | null): void;
   destroyed(): boolean;
   name(): string;
