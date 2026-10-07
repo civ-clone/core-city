@@ -14,6 +14,7 @@ export declare class CityRegistry
   implements ICityRegistry
 {
   private _byTile;
+  private _byPlayer;
   constructor();
   getByPlayer(player: Player, includeDestroyed?: boolean): City[];
   getByTile(tile: Tile): City | null;

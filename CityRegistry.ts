@@ -20,19 +20,21 @@ export class CityRegistry
   // needs no `reindex`. The AI asks "is there a city here?" of every tile it
   // knows, every turn, and of the 81 tiles around every candidate site.
   private _byTile = this.index((city: City): Tile => city.tile());
+  // A city's owner does change, on capture, and `City#capture` says so (`keysChanged`) (civ-clone/web-renderer#308).
+  private _byPlayer = this.index((city: City): Player => city.player());
 
   constructor() {
     super(City);
   }
 
   getByPlayer(player: Player, includeDestroyed: boolean = false): City[] {
+    const cities = this._byPlayer.get(player);
+
     if (includeDestroyed) {
-      return this.getBy('player', player);
+      return cities;
     }
 
-    return this.filter(
-      (city: City): boolean => city.player() === player && !city.destroyed()
-    );
+    return cities.filter((city: City): boolean => !city.destroyed());
   }
 
   getByTile(tile: Tile): City | null {

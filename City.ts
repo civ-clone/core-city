@@ -22,6 +22,7 @@ import WorkedTile from './WorkedTile';
 import Yield from '@civ-clone/core-yield/Yield';
 import YieldRule from './Rules/Yield';
 import YieldModifier from './Rules/YieldModifier';
+import keysChanged from '@civ-clone/core-registry/keysChanged';
 
 export interface ICity extends IDataObject {
   capture(player: Player, cause?: unknown): void;
@@ -88,6 +89,9 @@ export class City extends DataObject implements ICity {
     const player = this._player;
 
     this._player = capturingPlayer;
+
+    // Before the rules, which may look the city up by its new owner.
+    keysChanged(this);
 
     this._ruleRegistry.process(Captured, this, capturingPlayer, player, cause);
   }
