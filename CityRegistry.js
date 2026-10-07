@@ -11,12 +11,15 @@ class CityRegistry extends EntityRegistry_1.EntityRegistry {
         // needs no `reindex`. The AI asks "is there a city here?" of every tile it
         // knows, every turn, and of the 81 tiles around every candidate site.
         this._byTile = this.index((city) => city.tile());
+        // A city's owner does change, on capture, and `City#capture` says so (`keysChanged`) (civ-clone/web-renderer#308).
+        this._byPlayer = this.index((city) => city.player());
     }
     getByPlayer(player, includeDestroyed = false) {
+        const cities = this._byPlayer.get(player);
         if (includeDestroyed) {
-            return this.getBy('player', player);
+            return cities;
         }
-        return this.filter((city) => city.player() === player && !city.destroyed());
+        return cities.filter((city) => !city.destroyed());
     }
     getByTile(tile) {
         const [city] = this._byTile

@@ -1,5 +1,6 @@
 import CityRegistry from '../CityRegistry';
 import Player from '@civ-clone/core-player/Player';
+import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
 import { expect } from 'chai';
 import setUpCity from './lib/setUpCity';
 
@@ -56,5 +57,51 @@ describe('CityRegistry', (): void => {
     city.capture(new Player());
 
     expect(cityRegistry.getByTile(city.tile())).to.equal(city);
+  });
+  it('should find a captured `City` by its new owner, in the order cities were registered', async (): Promise<void> => {
+    const ruleRegistry = new RuleRegistry(),
+      cityRegistry = new CityRegistry(),
+      first = await setUpCity('city #1', ruleRegistry),
+      second = await setUpCity('city #2', ruleRegistry),
+      third = await setUpCity('city #3', ruleRegistry),
+      owner = first.player(),
+      captor = new Player(ruleRegistry);
+
+    second.capture(owner);
+    third.capture(owner);
+    cityRegistry.register(first, second, third);
+
+    expect(cityRegistry.getByPlayer(owner)).to.deep.equal([
+      first,
+      second,
+      third,
+    ]);
+
+    first.capture(captor);
+
+    expect(cityRegistry.getByPlayer(owner)).to.deep.equal([second, third]);
+    expect(cityRegistry.getByPlayer(captor)).to.deep.equal([first]);
+
+    // Taken back, it's where it was: the order is the registry's, not the order of capture (civ-clone/web-renderer#308).
+    first.capture(owner);
+
+    expect(cityRegistry.getByPlayer(owner)).to.deep.equal([
+      first,
+      second,
+      third,
+    ]);
+    expect(cityRegistry.getByPlayer(captor)).to.deep.equal([]);
+  });
+
+  it('should leave out a destroyed `City` unless asked', async (): Promise<void> => {
+    const ruleRegistry = new RuleRegistry(),
+      cityRegistry = new CityRegistry(),
+      city = await setUpCity('city #1', ruleRegistry);
+
+    cityRegistry.register(city);
+    city.destroy();
+
+    expect(cityRegistry.getByPlayer(city.player())).to.deep.equal([]);
+    expect(cityRegistry.getByPlayer(city.player(), true)).to.deep.equal([city]);
   });
 });

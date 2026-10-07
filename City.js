@@ -13,6 +13,7 @@ const Tileset_1 = require("@civ-clone/core-world/Tileset");
 const Yield_1 = require("@civ-clone/core-yield/Yield");
 const Yield_2 = require("./Rules/Yield");
 const YieldModifier_1 = require("./Rules/YieldModifier");
+const keysChanged_1 = require("@civ-clone/core-registry/keysChanged");
 class City extends DataObject_1.DataObject {
     constructor(player, tile, name, ruleRegistry = RuleRegistry_1.instance, workedTileRegistry = WorkedTileRegistry_1.instance) {
         super();
@@ -35,6 +36,8 @@ class City extends DataObject_1.DataObject {
         // Should this method even exist? Thinking about just having a `setPlayer` method and having this `Rule`-controlled..
         const player = this._player;
         this._player = capturingPlayer;
+        // Before the rules, which may look the city up by its new owner.
+        (0, keysChanged_1.default)(this);
         this._ruleRegistry.process(Captured_1.default, this, capturingPlayer, player, cause);
     }
     destroy(player = null) {
