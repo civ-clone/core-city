@@ -26,6 +26,14 @@ export class WorkedTileRegistry
   extends EntityRegistry<WorkedTile>
   implements IWorkedTileRegistry
 {
+  // A worked tile's city and tile are set when it's made and never change, so these need no `keysChanged`. Scanning
+  //  every worked tile for each lookup was ~2% of a late-game turn (civ-clone/web-renderer#308).
+  private _byCity = this.index(
+    (workedTile: WorkedTile): City => workedTile.city()
+  );
+  private _byTile = this.index(
+    (workedTile: WorkedTile): Tile => workedTile.tile()
+  );
   private _ruleRegistry: RuleRegistry;
 
   constructor(ruleRegistry: RuleRegistry = ruleRegistryInstance) {
@@ -35,20 +43,20 @@ export class WorkedTileRegistry
   }
 
   getByCity(city: City): WorkedTile[] {
-    return this.getBy('city', city);
+    return this._byCity.get(city);
   }
 
   getByTile(tile: Tile): WorkedTile | null {
-    const [workedTile] = this.getBy('tile', tile);
+    const [workedTile] = this._byTile.get(tile);
 
     return workedTile ?? null;
   }
 
   getTilesByCity(city: City): Tileset {
     return Tileset.from(
-      ...this.filter(
-        (workedTile: WorkedTile): boolean => workedTile.city() === city
-      ).map((workedTile: WorkedTile): Tile => workedTile.tile())
+      ...this._byCity
+        .get(city)
+        .map((workedTile: WorkedTile): Tile => workedTile.tile())
     );
   }
 
