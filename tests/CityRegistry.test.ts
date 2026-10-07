@@ -1,4 +1,7 @@
+import Captured from '../Rules/Captured';
+import City from '../City';
 import CityRegistry from '../CityRegistry';
+import Effect from '@civ-clone/core-rule/Effect';
 import Player from '@civ-clone/core-player/Player';
 import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
 import { expect } from 'chai';
@@ -91,6 +94,31 @@ describe('CityRegistry', (): void => {
       third,
     ]);
     expect(cityRegistry.getByPlayer(captor)).to.deep.equal([]);
+  });
+
+  it('should file a captured `City` under its new owner before the `Captured` rules run', async (): Promise<void> => {
+    // The rules may look the city up by its new owner, which is why `capture` re-files it first.
+    const ruleRegistry = new RuleRegistry(),
+      cityRegistry = new CityRegistry(),
+      city = await setUpCity('city #1', ruleRegistry),
+      captor = new Player(ruleRegistry),
+      seen: { captor: City[]; previous: City[] }[] = [];
+
+    ruleRegistry.register(
+      new Captured(
+        new Effect((captured: City, capturingPlayer: Player, from: Player) =>
+          seen.push({
+            captor: cityRegistry.getByPlayer(capturingPlayer),
+            previous: cityRegistry.getByPlayer(from),
+          })
+        )
+      )
+    );
+
+    cityRegistry.register(city);
+    city.capture(captor);
+
+    expect(seen).to.deep.equal([{ captor: [city], previous: [] }]);
   });
 
   it('should leave out a destroyed `City` unless asked', async (): Promise<void> => {
