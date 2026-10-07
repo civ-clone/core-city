@@ -1,5 +1,6 @@
 import City from './City';
 import DataObject from '@civ-clone/core-data-object/DataObject';
+import keysChanged from '@civ-clone/core-registry/keysChanged';
 
 /**
  * A trade route held by `from()`, its home city, to `to()`. A route is one-way: only `from()` gains by it. What a route
@@ -25,6 +26,8 @@ export class TradeRoute extends DataObject {
 
   setTo(to: City): void {
     this._to = to;
+
+    keysChanged(this);
   }
 
   to(): City {

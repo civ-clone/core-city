@@ -11,6 +11,8 @@ export declare class TradeRouteRegistry
   extends EntityRegistry<TradeRoute>
   implements ITradeRouteRegistry
 {
+  private _byCity;
+  private _byPartner;
   constructor();
   /** The routes `city` holds, in the order they were set up. */
   getByCity(city: City): TradeRoute[];
