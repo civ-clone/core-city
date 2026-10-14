@@ -8,8 +8,10 @@ import EntityRegistry, {
   IEntityRegistry,
 } from '@civ-clone/core-registry/EntityRegistry';
 import Tile from '@civ-clone/core-world/Tile';
+import TileReleased from './Rules/TileReleased';
+import TileWorked from './Rules/TileWorked';
 import Tileset from '@civ-clone/core-world/Tileset';
-import WorkedTile from './WorkedTile';
+import WorkedTile, { isRestored } from './WorkedTile';
 import workedBy from './AdditionalData/worked-by';
 
 export interface IWorkedTileRegistry extends IEntityRegistry<WorkedTile> {
@@ -19,6 +21,7 @@ export interface IWorkedTileRegistry extends IEntityRegistry<WorkedTile> {
   register(...workedTiles: WorkedTile[]): void;
   tileCanBeWorkedBy(tile: Tile, city: City): boolean;
   tileIsWorked(tile: Tile): boolean;
+  unregister(...workedTiles: WorkedTile[]): void;
   unregisterByTile(tile: Tile): void;
 }
 
@@ -70,6 +73,12 @@ export class WorkedTileRegistry
       }
 
       super.register(workedTile);
+
+      // Once per tile, after it is registered, so a rule sees the tile as worked. A tile restored from a save was already
+      //  worked, so loading a game processes nothing.
+      if (!isRestored(workedTile)) {
+        this._ruleRegistry.process(TileWorked, workedTile.city(), tile);
+      }
     });
   }
 
@@ -81,6 +90,23 @@ export class WorkedTileRegistry
 
   tileIsWorked(tile: Tile): boolean {
     return !!this.getByTile(tile);
+  }
+
+  // Every way a tile stops being worked comes through here, `unregisterByTile` included.
+  unregister(...workedTiles: WorkedTile[]): void {
+    workedTiles.forEach((workedTile: WorkedTile): void => {
+      if (!this.includes(workedTile)) {
+        return;
+      }
+
+      super.unregister(workedTile);
+
+      this._ruleRegistry.process(
+        TileReleased,
+        workedTile.city(),
+        workedTile.tile()
+      );
+    });
   }
 
   unregisterByTile(tile: Tile): void {

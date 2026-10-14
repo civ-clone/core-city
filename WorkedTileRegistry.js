@@ -4,6 +4,8 @@ exports.instance = exports.WorkedTileRegistry = void 0;
 const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
 const CanBeWorked_1 = require("./Rules/CanBeWorked");
 const EntityRegistry_1 = require("@civ-clone/core-registry/EntityRegistry");
+const TileReleased_1 = require("./Rules/TileReleased");
+const TileWorked_1 = require("./Rules/TileWorked");
 const Tileset_1 = require("@civ-clone/core-world/Tileset");
 const WorkedTile_1 = require("./WorkedTile");
 class WorkedTileRegistry extends EntityRegistry_1.default {
@@ -34,6 +36,11 @@ class WorkedTileRegistry extends EntityRegistry_1.default {
                 throw new TypeError(`Tile ${tile.x()}, ${tile.y()} is already worked!`);
             }
             super.register(workedTile);
+            // Once per tile, after it is registered, so a rule sees the tile as worked. A tile restored from a save was already
+            //  worked, so loading a game processes nothing.
+            if (!(0, WorkedTile_1.isRestored)(workedTile)) {
+                this._ruleRegistry.process(TileWorked_1.default, workedTile.city(), tile);
+            }
         });
     }
     tileCanBeWorkedBy(tile, city) {
@@ -43,6 +50,16 @@ class WorkedTileRegistry extends EntityRegistry_1.default {
     }
     tileIsWorked(tile) {
         return !!this.getByTile(tile);
+    }
+    // Every way a tile stops being worked comes through here, `unregisterByTile` included.
+    unregister(...workedTiles) {
+        workedTiles.forEach((workedTile) => {
+            if (!this.includes(workedTile)) {
+                return;
+            }
+            super.unregister(workedTile);
+            this._ruleRegistry.process(TileReleased_1.default, workedTile.city(), workedTile.tile());
+        });
     }
     unregisterByTile(tile) {
         const workedTile = this.getByTile(tile);

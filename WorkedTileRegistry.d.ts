@@ -13,6 +13,7 @@ export interface IWorkedTileRegistry extends IEntityRegistry<WorkedTile> {
   register(...workedTiles: WorkedTile[]): void;
   tileCanBeWorkedBy(tile: Tile, city: City): boolean;
   tileIsWorked(tile: Tile): boolean;
+  unregister(...workedTiles: WorkedTile[]): void;
   unregisterByTile(tile: Tile): void;
 }
 export declare class WorkedTileRegistry
@@ -29,6 +30,7 @@ export declare class WorkedTileRegistry
   register(...workedTiles: WorkedTile[]): void;
   tileCanBeWorkedBy(tile: Tile, city: City): boolean;
   tileIsWorked(tile: Tile): boolean;
+  unregister(...workedTiles: WorkedTile[]): void;
   unregisterByTile(tile: Tile): void;
 }
 export declare const instance: WorkedTileRegistry;
