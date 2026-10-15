@@ -2,13 +2,22 @@ import City from './City';
 import DataObject from '@civ-clone/core-data-object/DataObject';
 import Tile from '@civ-clone/core-world/Tile';
 
-// Every `WorkedTile` made with `new`. Loading a saved game puts its worked tiles back with `Object.create`, which never
-//  calls the constructor, so registering one of those restores a tile that was already worked rather than working it,
-//  and `WorkedTileRegistry` doesn't process `TileWorked` for it.
+// Every `WorkedTile` made with `new`, and every restored one once it has been registered. Loading a saved game puts its
+//  worked tiles back with `Object.create`, which never calls the constructor, so registering one of those the first time
+//  restores a tile that was already worked rather than working it, and `WorkedTileRegistry` doesn't process `TileWorked`
+//  for it. That is only the first registration: after `consumeRestored` it is an ordinary tile, so registering it again
+//  later (after it was unregistered) is a real change.
 const constructed = new WeakSet<WorkedTile>();
 
-export const isRestored = (workedTile: WorkedTile): boolean =>
-  !constructed.has(workedTile);
+export const consumeRestored = (workedTile: WorkedTile): boolean => {
+  if (constructed.has(workedTile)) {
+    return false;
+  }
+
+  constructed.add(workedTile);
+
+  return true;
+};
 
 export class WorkedTile extends DataObject {
   private _city: City;
