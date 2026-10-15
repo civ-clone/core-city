@@ -151,4 +151,36 @@ describe('WorkedTileRegistry', (): void => {
 
     expect(processed).to.deep.equal(['released']);
   });
+
+  it('should process TileWorked when a restored worked tile is registered again after being released', async (): Promise<void> => {
+    const ruleRegistry = new RuleRegistry(),
+      registry = new WorkedTileRegistry(ruleRegistry),
+      city = await setUpCity('city', ruleRegistry, registry),
+      tile = await generateTile(ruleRegistry),
+      restored = Object.assign(Object.create(WorkedTile.prototype), {
+        _city: city,
+        _tile: tile,
+      }) as WorkedTile,
+      processed: string[] = [];
+
+    ruleRegistry.register(
+      new TileWorked(
+        new Effect((): void => {
+          processed.push('worked');
+        })
+      ),
+      new TileReleased(
+        new Effect((): void => {
+          processed.push('released');
+        })
+      )
+    );
+
+    registry.register(restored);
+    registry.unregister(restored);
+    registry.register(restored);
+
+    expect(registry.getByTile(tile)).to.equal(restored);
+    expect(processed).to.deep.equal(['released', 'worked']);
+  });
 });

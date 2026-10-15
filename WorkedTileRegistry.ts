@@ -11,7 +11,7 @@ import Tile from '@civ-clone/core-world/Tile';
 import TileReleased from './Rules/TileReleased';
 import TileWorked from './Rules/TileWorked';
 import Tileset from '@civ-clone/core-world/Tileset';
-import WorkedTile, { isRestored } from './WorkedTile';
+import WorkedTile, { consumeRestored } from './WorkedTile';
 import workedBy from './AdditionalData/worked-by';
 
 export interface IWorkedTileRegistry extends IEntityRegistry<WorkedTile> {
@@ -75,8 +75,8 @@ export class WorkedTileRegistry
       super.register(workedTile);
 
       // Once per tile, after it is registered, so a rule sees the tile as worked. A tile restored from a save was already
-      //  worked, so loading a game processes nothing.
-      if (!isRestored(workedTile)) {
+      //  worked, so only that first registration, which loading a game performs, processes nothing.
+      if (!consumeRestored(workedTile)) {
         this._ruleRegistry.process(TileWorked, workedTile.city(), tile);
       }
     });

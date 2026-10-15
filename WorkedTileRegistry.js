@@ -37,8 +37,8 @@ class WorkedTileRegistry extends EntityRegistry_1.default {
             }
             super.register(workedTile);
             // Once per tile, after it is registered, so a rule sees the tile as worked. A tile restored from a save was already
-            //  worked, so loading a game processes nothing.
-            if (!(0, WorkedTile_1.isRestored)(workedTile)) {
+            //  worked, so only that first registration, which loading a game performs, processes nothing.
+            if (!(0, WorkedTile_1.consumeRestored)(workedTile)) {
                 this._ruleRegistry.process(TileWorked_1.default, workedTile.city(), tile);
             }
         });

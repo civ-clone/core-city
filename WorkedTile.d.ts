@@ -1,7 +1,7 @@
 import City from './City';
 import DataObject from '@civ-clone/core-data-object/DataObject';
 import Tile from '@civ-clone/core-world/Tile';
-export declare const isRestored: (workedTile: WorkedTile) => boolean;
+export declare const consumeRestored: (workedTile: WorkedTile) => boolean;
 export declare class WorkedTile extends DataObject {
   private _city;
   private _tile;
