@@ -69,18 +69,7 @@ class City extends DataObject_1.DataObject {
         return this._workedTileRegistry.getTilesByCity(this);
     }
     yields() {
-        const yields = [];
-        [
-            this._ruleRegistry.get(Yield_2.default),
-            this._ruleRegistry.get(YieldModifier_1.default),
-            this._ruleRegistry.get(Cost_1.default),
-        ]
-            .flat()
-            .forEach((rule) => {
-            if (!rule.validate(this, yields)) {
-                return;
-            }
-            const cityYields = rule.process(this, yields);
+        const yields = [], push = (cityYields) => {
             if (!cityYields) {
                 return;
             }
@@ -89,6 +78,26 @@ class City extends DataObject_1.DataObject {
                 return;
             }
             cityYields.forEach((cityYield) => yields.push(cityYield));
+        };
+        this._ruleRegistry.get(Yield_2.default).forEach((rule) => {
+            if (rule.validate(this, yields)) {
+                push(rule.process(this, yields));
+            }
+        });
+        // What the `YieldRule`s produced, before any modifier. A modifier that adds a share of the base (a Library's +50%)
+        //  reads this, so it doesn't compound on another modifier's output whatever order the rules run in.
+        const base = [...yields];
+        this._ruleRegistry
+            .get(YieldModifier_1.default)
+            .forEach((rule) => {
+            if (rule.validate(this, yields, base)) {
+                push(rule.process(this, yields, base));
+            }
+        });
+        this._ruleRegistry.get(Cost_1.default).forEach((rule) => {
+            if (rule.validate(this, yields)) {
+                push(rule.process(this, yields));
+            }
         });
         return yields;
     }

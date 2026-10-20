@@ -134,4 +134,27 @@ describe('City', (): void => {
       expect(reduceYield(city.yields(), YieldValue)).equal(expectedValue);
     });
   });
+  it('should give each `YieldModifier` the base yields, untouched by earlier modifiers', async (): Promise<void> => {
+    const ruleRegistry = new RuleRegistry(),
+      city = await setUpCity('name', ruleRegistry),
+      halfOfBase = () =>
+        new YieldModifier(
+          new Effect(
+            (city: City, yields: YieldValue[], base: YieldValue[]) =>
+              new YieldValue(
+                Math.floor(reduceYield(base, YieldValue) / 2),
+                'Modifier'
+              )
+          )
+        );
+
+    ruleRegistry.register(
+      new Yield(new Effect(() => new YieldValue(4, 'BaseValue'))),
+      halfOfBase(),
+      halfOfBase()
+    );
+
+    // 4 + 2 + 2, where reading the running total would give 4 + 2 + 3.
+    expect(reduceYield(city.yields(), YieldValue)).equal(8);
+  });
 });
