@@ -9,6 +9,7 @@ const Tiles_1 = require("./Rules/Tiles");
 const Cost_1 = require("./Rules/Cost");
 const Created_1 = require("./Rules/Created");
 const Destroyed_1 = require("./Rules/Destroyed");
+const Renamed_1 = require("./Rules/Renamed");
 const Tileset_1 = require("@civ-clone/core-world/Tileset");
 const Yield_1 = require("@civ-clone/core-yield/Yield");
 const Yield_2 = require("./Rules/Yield");
@@ -50,8 +51,14 @@ class City extends DataObject_1.DataObject {
     name() {
         return this._name;
     }
+    /** Gives the city `name`, and processes the `Renamed` rules with the name it had. The same name again does nothing. */
     setName(name) {
+        const previous = this._name;
+        if (name === previous) {
+            return;
+        }
         this._name = name;
+        this._ruleRegistry.process(Renamed_1.default, this, previous);
     }
     originalPlayer() {
         return this._originalPlayer;

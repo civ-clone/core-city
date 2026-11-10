@@ -4,6 +4,7 @@ import City from '../City';
 import Cost from '../Rules/Cost';
 import Created from '../Rules/Created';
 import Destroyed from '../Rules/Destroyed';
+import Renamed from '../Rules/Renamed';
 import WorkedTile from '../WorkedTile';
 import { WorkedTileRegistry } from '../WorkedTileRegistry';
 import Effect from '@civ-clone/core-rule/Effect';
@@ -81,6 +82,30 @@ describe('City', (): void => {
     city.setName('city #2');
 
     expect(city.name()).to.equal('city #2');
+  });
+
+  it('should process the `Renamed` `Rule`s with the name the city had, and not for the name it has already', async (): Promise<void> => {
+    const ruleRegistry = new RuleRegistry(),
+      renamed: [string, string][] = [];
+
+    ruleRegistry.register(
+      new Renamed(
+        new Effect((city: City, previous: string): void => {
+          renamed.push([city.name(), previous]);
+        })
+      )
+    );
+
+    const city = await setUpCity('Thebes', ruleRegistry);
+
+    city.setName('Athens');
+    city.setName('Athens');
+    city.setName('Sparta');
+
+    expect(renamed).eql([
+      ['Athens', 'Thebes'],
+      ['Sparta', 'Athens'],
+    ]);
   });
 
   it('should be possible to get yields via `tilesWorked`', async (): Promise<void> => {
