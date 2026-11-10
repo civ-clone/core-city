@@ -45,6 +45,7 @@ export declare class City extends DataObject implements ICity {
   destroy(player?: Player | null): void;
   destroyed(): boolean;
   name(): string;
+  /** Gives the city `name`, and processes the `Renamed` rules with the name it had. The same name again does nothing. */
   setName(name: string): void;
   originalPlayer(): Player;
   player(): Player;

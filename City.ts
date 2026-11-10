@@ -15,6 +15,7 @@ import Tiles from './Rules/Tiles';
 import Cost from './Rules/Cost';
 import Created from './Rules/Created';
 import Destroyed from './Rules/Destroyed';
+import Renamed from './Rules/Renamed';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
@@ -110,8 +111,17 @@ export class City extends DataObject implements ICity {
     return this._name;
   }
 
+  /** Gives the city `name`, and processes the `Renamed` rules with the name it had. The same name again does nothing. */
   setName(name: string): void {
+    const previous = this._name;
+
+    if (name === previous) {
+      return;
+    }
+
     this._name = name;
+
+    this._ruleRegistry.process(Renamed, this, previous);
   }
 
   originalPlayer(): Player {
