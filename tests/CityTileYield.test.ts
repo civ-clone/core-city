@@ -140,6 +140,12 @@ describe('City#tileYields', (): void => {
     expect(city.tileYields(tile, []) === tile.yields(city.player())).true;
   });
 
+  it('gives the rules it was made with', async (): Promise<void> => {
+    const { city, ruleRegistry } = await setUp();
+
+    expect(city.ruleRegistry() === ruleRegistry).true;
+  });
+
   it('leaves a disabled rule out', async (): Promise<void> => {
     const { city, ruleRegistry, tile } = await setUp(),
       rule = new CityTileYield(

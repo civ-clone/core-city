@@ -54,6 +54,11 @@ export declare class City extends DataObject implements ICity {
   tiles(): Tileset;
   tilesWorked(): Tileset;
   /**
+   * The rules the city was made with: the game's own. For a ruleset's seams that ask about this city (which kinds of
+   *  specialist it may have, say), so a caller that doesn't pass a registry still gets the game's rules.
+   */
+  ruleRegistry(): RuleRegistry;
+  /**
    * The `CityTileYield` rules that change what a square gives this city: none unless a ruleset registers some. Get them
    *  once and pass them to `tileYields` for each square, when asking about many squares at once.
    */
