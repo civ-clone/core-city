@@ -4,6 +4,7 @@ import {
 } from '@civ-clone/core-data-object/DataObject';
 import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
 import { WorkedTileRegistry } from './WorkedTileRegistry';
+import CityTileYield from './Rules/CityTileYield';
 import Player from '@civ-clone/core-player/Player';
 import Tile from '@civ-clone/core-world/Tile';
 import Tileset from '@civ-clone/core-world/Tileset';
@@ -52,6 +53,25 @@ export declare class City extends DataObject implements ICity {
   tile(): Tile;
   tiles(): Tileset;
   tilesWorked(): Tileset;
+  /**
+   * The rules the city was made with: the game's own. For a ruleset's seams that ask about this city (which kinds of
+   *  specialist it may have, say), so a caller that doesn't pass a registry still gets the game's rules.
+   */
+  ruleRegistry(): RuleRegistry;
+  /**
+   * The `CityTileYield` rules that change what a square gives this city: none unless a ruleset registers some. Get them
+   *  once and pass them to `tileYields` for each square, when asking about many squares at once.
+   */
+  tileYieldRules(): CityTileYield[];
+  /**
+   * What `tile` gives this city: the tile's yields for the city's player, changed by the `CityTileYield` rules, in
+   *  order. Everything that asks what a square gives a city asks this, so that the city's yields, how it places its
+   *  workers and what a client shows all agree.
+   *
+   * With no rules, it is `tile.yields(player)` itself: the tile's cached array, which must not be changed. With rules,
+   *  each yield is copied first, provider by provider, and the rules change the copies.
+   */
+  tileYields(tile: Tile, rules?: CityTileYield[]): Yield[];
   yields(): Yield[];
   /**
    * Put the `Tileset` back around the restored tiles.

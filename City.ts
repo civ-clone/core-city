@@ -11,6 +11,7 @@ import {
   instance as workedTileRegistryInstance,
 } from './WorkedTileRegistry';
 import Captured from './Rules/Captured';
+import CityTileYield from './Rules/CityTileYield';
 import Tiles from './Rules/Tiles';
 import Cost from './Rules/Cost';
 import Created from './Rules/Created';
@@ -142,6 +143,58 @@ export class City extends DataObject implements ICity {
 
   tilesWorked(): Tileset {
     return this._workedTileRegistry.getTilesByCity(this);
+  }
+
+  /**
+   * The rules the city was made with: the game's own. For a ruleset's seams that ask about this city (which kinds of
+   *  specialist it may have, say), so a caller that doesn't pass a registry still gets the game's rules.
+   */
+  ruleRegistry(): RuleRegistry {
+    return this._ruleRegistry;
+  }
+
+  /**
+   * The `CityTileYield` rules that change what a square gives this city: none unless a ruleset registers some. Get them
+   *  once and pass them to `tileYields` for each square, when asking about many squares at once.
+   */
+  tileYieldRules(): CityTileYield[] {
+    return this._ruleRegistry.get(CityTileYield);
+  }
+
+  /**
+   * What `tile` gives this city: the tile's yields for the city's player, changed by the `CityTileYield` rules, in
+   *  order. Everything that asks what a square gives a city asks this, so that the city's yields, how it places its
+   *  workers and what a client shows all agree.
+   *
+   * With no rules, it is `tile.yields(player)` itself: the tile's cached array, which must not be changed. With rules,
+   *  each yield is copied first, provider by provider, and the rules change the copies.
+   */
+  tileYields(
+    tile: Tile,
+    rules: CityTileYield[] = this.tileYieldRules()
+  ): Yield[] {
+    const tileYields = tile.yields(this._player);
+
+    if (rules.length === 0) {
+      return tileYields;
+    }
+
+    const yields = tileYields.map((tileYield: Yield): Yield => {
+      const [first, ...rest] = tileYield.values(),
+        copy = new (tileYield.constructor as typeof Yield)(...(first ?? []));
+
+      rest.forEach(([value, provider]) => copy.add(value, provider));
+
+      return copy;
+    });
+
+    rules.forEach((rule: CityTileYield): void => {
+      if (rule.validate(this, tile, yields)) {
+        rule.process(this, tile, yields);
+      }
+    });
+
+    return yields;
   }
 
   yields(): Yield[] {
