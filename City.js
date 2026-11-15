@@ -5,6 +5,7 @@ const DataObject_1 = require("@civ-clone/core-data-object/DataObject");
 const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
 const WorkedTileRegistry_1 = require("./WorkedTileRegistry");
 const Captured_1 = require("./Rules/Captured");
+const CityTileYield_1 = require("./Rules/CityTileYield");
 const Tiles_1 = require("./Rules/Tiles");
 const Cost_1 = require("./Rules/Cost");
 const Created_1 = require("./Rules/Created");
@@ -74,6 +75,38 @@ class City extends DataObject_1.DataObject {
     }
     tilesWorked() {
         return this._workedTileRegistry.getTilesByCity(this);
+    }
+    /**
+     * The `CityTileYield` rules that change what a square gives this city: none unless a ruleset registers some. Get them
+     *  once and pass them to `tileYields` for each square, when asking about many squares at once.
+     */
+    tileYieldRules() {
+        return this._ruleRegistry.get(CityTileYield_1.default);
+    }
+    /**
+     * What `tile` gives this city: the tile's yields for the city's player, changed by the `CityTileYield` rules, in
+     *  order. Everything that asks what a square gives a city asks this, so that the city's yields, how it places its
+     *  workers and what a client shows all agree.
+     *
+     * With no rules, it is `tile.yields(player)` itself: the tile's cached array, which must not be changed. With rules,
+     *  each yield is copied first, provider by provider, and the rules change the copies.
+     */
+    tileYields(tile, rules = this.tileYieldRules()) {
+        const tileYields = tile.yields(this._player);
+        if (rules.length === 0) {
+            return tileYields;
+        }
+        const yields = tileYields.map((tileYield) => {
+            const [first, ...rest] = tileYield.values(), copy = new tileYield.constructor(...(first !== null && first !== void 0 ? first : []));
+            rest.forEach(([value, provider]) => copy.add(value, provider));
+            return copy;
+        });
+        rules.forEach((rule) => {
+            if (rule.validate(this, tile, yields)) {
+                rule.process(this, tile, yields);
+            }
+        });
+        return yields;
     }
     yields() {
         const yields = [], push = (cityYields) => {
