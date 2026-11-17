@@ -13,6 +13,7 @@ import {
 import Captured from './Rules/Captured';
 import CityTileYield from './Rules/CityTileYield';
 import Tiles from './Rules/Tiles';
+import Transferred from './Rules/Transferred';
 import Cost from './Rules/Cost';
 import Created from './Rules/Created';
 import Destroyed from './Rules/Destroyed';
@@ -36,6 +37,7 @@ export interface ICity extends IDataObject {
   tile(): Tile;
   tiles(): Tileset;
   tilesWorked(): Tileset;
+  transfer(player: Player): void;
   yields(): Yield[];
 }
 
@@ -96,6 +98,21 @@ export class City extends DataObject implements ICity {
     keysChanged(this);
 
     this._ruleRegistry.process(Captured, this, capturingPlayer, player, cause);
+  }
+
+  /**
+   * Gives the city to `player` without capturing it: it keeps everything it has, and only the `Transferred` rules run,
+   *  never the `Captured` ones. For a city that changes hands peacefully, such as one that joins rebels in a civil war.
+   */
+  transfer(player: Player): void {
+    const previousPlayer = this._player;
+
+    this._player = player;
+
+    // Before the rules, which may look the city up by its new owner.
+    keysChanged(this);
+
+    this._ruleRegistry.process(Transferred, this, player, previousPlayer);
   }
 
   destroy(player: Player | null = null): void {
