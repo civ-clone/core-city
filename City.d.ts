@@ -19,6 +19,7 @@ export interface ICity extends IDataObject {
   tile(): Tile;
   tiles(): Tileset;
   tilesWorked(): Tileset;
+  transfer(player: Player): void;
   yields(): Yield[];
 }
 export declare class City extends DataObject implements ICity {
@@ -43,6 +44,11 @@ export declare class City extends DataObject implements ICity {
    * Diplomat's incite action, say). A conquest passes nothing.
    */
   capture(capturingPlayer: Player, cause?: unknown): void;
+  /**
+   * Gives the city to `player` without capturing it: it keeps everything it has, and only the `Transferred` rules run,
+   *  never the `Captured` ones. For a city that changes hands peacefully, such as one that joins rebels in a civil war.
+   */
+  transfer(player: Player): void;
   destroy(player?: Player | null): void;
   destroyed(): boolean;
   name(): string;

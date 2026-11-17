@@ -5,6 +5,7 @@ import Cost from '../Rules/Cost';
 import Created from '../Rules/Created';
 import Destroyed from '../Rules/Destroyed';
 import Renamed from '../Rules/Renamed';
+import Transferred from '../Rules/Transferred';
 import WorkedTile from '../WorkedTile';
 import { WorkedTileRegistry } from '../WorkedTileRegistry';
 import Effect from '@civ-clone/core-rule/Effect';
@@ -72,6 +73,28 @@ describe('City', (): void => {
     city.destroy(destroyingPlayer);
 
     expect(destroyedSpy).to.called.with(city, destroyingPlayer);
+  });
+
+  it('should process only `Transferred` `Rule`s when transferred', async (): Promise<void> => {
+    const ruleRegistry = new RuleRegistry(),
+      capturedSpy = spy(),
+      transferredSpy = spy(),
+      rebel = new Player(ruleRegistry);
+
+    ruleRegistry.register(
+      new Captured(new Effect(capturedSpy)),
+      new Transferred(new Effect(transferredSpy))
+    );
+
+    const city = await setUpCity('city #1', ruleRegistry),
+      originalPlayer = city.player();
+
+    city.transfer(rebel);
+
+    expect(transferredSpy).called.once.with(city, rebel, originalPlayer);
+    expect(capturedSpy).not.called;
+    expect(city.player()).to.equal(rebel);
+    expect(city.originalPlayer()).to.equal(originalPlayer);
   });
 
   it('should be possible to rename the city', async (): Promise<void> => {

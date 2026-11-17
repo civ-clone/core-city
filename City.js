@@ -7,6 +7,7 @@ const WorkedTileRegistry_1 = require("./WorkedTileRegistry");
 const Captured_1 = require("./Rules/Captured");
 const CityTileYield_1 = require("./Rules/CityTileYield");
 const Tiles_1 = require("./Rules/Tiles");
+const Transferred_1 = require("./Rules/Transferred");
 const Cost_1 = require("./Rules/Cost");
 const Created_1 = require("./Rules/Created");
 const Destroyed_1 = require("./Rules/Destroyed");
@@ -41,6 +42,17 @@ class City extends DataObject_1.DataObject {
         // Before the rules, which may look the city up by its new owner.
         (0, keysChanged_1.default)(this);
         this._ruleRegistry.process(Captured_1.default, this, capturingPlayer, player, cause);
+    }
+    /**
+     * Gives the city to `player` without capturing it: it keeps everything it has, and only the `Transferred` rules run,
+     *  never the `Captured` ones. For a city that changes hands peacefully, such as one that joins rebels in a civil war.
+     */
+    transfer(player) {
+        const previousPlayer = this._player;
+        this._player = player;
+        // Before the rules, which may look the city up by its new owner.
+        (0, keysChanged_1.default)(this);
+        this._ruleRegistry.process(Transferred_1.default, this, player, previousPlayer);
     }
     destroy(player = null) {
         this._destroyed = true;
